@@ -1,18 +1,11 @@
+
 import type { Request, Response, NextFunction } from "express";
 
-const studentValidation = (req: Request,res: Response,next: NextFunction) => {
-
-    if (
-        typeof req.body.id !== "number" ||
-        Number.isNaN(req.body.id)
-    ) {
-        res.status(400).json({
-            message: "ID must be a valid number"
-        });
-        return;
-    }
-
-    
+const studentValidation = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
     if (
         typeof req.body.name !== "string" ||
         req.body.name.trim().length === 0
@@ -23,7 +16,6 @@ const studentValidation = (req: Request,res: Response,next: NextFunction) => {
         return;
     }
 
-    
     if (
         typeof req.body.branch !== "string" ||
         req.body.branch.trim().length === 0
@@ -34,7 +26,6 @@ const studentValidation = (req: Request,res: Response,next: NextFunction) => {
         return;
     }
 
-    
     next();
 };
 

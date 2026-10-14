@@ -1,4 +1,6 @@
-export const students=[
-    {id:1,name:"sakshi",branch:"CSE"},
-    {id:2,name:"Rahul",branch:"IT"}
-];
+
+import prisma from "../prisma.js";
+
+export const getAllStudents = async () => {
+  return await prisma.student.findMany();
+};

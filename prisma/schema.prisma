@@ -7,29 +7,19 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Role {
-  ADMIN
-  STUDENT
-  PLACEMENT_COORDINATOR
-  RECRUITER
-}
-
 model User {
-  id           Int     @id @default(autoincrement())
-  email        String  @unique
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
   passwordHash String
-  role         Role    @default(STUDENT)
-  isActive     Boolean @default(true)
-
-  studentId Int?     @unique
-  student   Student? @relation(fields: [studentId], references: [id], onDelete: SetNull)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  role         Role     @default(STUDENT)
+  isActive     Boolean  @default(true)
+  studentId    Int?     @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  student      Student? @relation(fields: [studentId], references: [id])
 }
 
 model Student {
-  user         User?
   id           Int           @id @default(autoincrement())
   name         String
   email        String        @unique
@@ -45,17 +35,17 @@ model Student {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   applications Application[]
+  user         User?
 }
 
 model Company {
-  id        Int      @id @default(autoincrement())
-  name      String   @unique
-  website   String?
-  industry  String?
-  location  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  website         String?
+  industry        String?
+  location        String?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
   placementDrives PlacementDrive[]
 }
 
@@ -67,23 +57,29 @@ model PlacementDrive {
   deadline            DateTime
   status              String        @default("OPEN")
   companyId           Int
-  company             Company       @relation(fields: [companyId], references: [id])
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
   applications        Application[]
+  company             Company       @relation(fields: [companyId], references: [id])
 }
 
 model Application {
-  id               Int      @id @default(autoincrement())
+  id               Int            @id @default(autoincrement())
   studentId        Int
   placementDriveId Int
-  status           String   @default("APPLIED")
-  appliedAt        DateTime @default(now())
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-
-  student        Student        @relation(fields: [studentId], references: [id])
-  placementDrive PlacementDrive @relation(fields: [placementDriveId], references: [id])
+  status           String         @default("APPLIED")
+  appliedAt        DateTime       @default(now())
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  placementDrive   PlacementDrive @relation(fields: [placementDriveId], references: [id])
+  student          Student        @relation(fields: [studentId], references: [id])
 
   @@unique([studentId, placementDriveId])
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+  PLACEMENT_COORDINATOR
+  RECRUITER
 }

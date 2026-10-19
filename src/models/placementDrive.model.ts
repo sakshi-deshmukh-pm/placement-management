@@ -19,9 +19,13 @@ export const createPlacementDrive = async (data: {
     });
 };
 
-export const getPlacementDrives=async()=>{
-    return await prisma.placementDrive.findMany();
-}
+export const getPlacementDrives = async () => {
+  return await prisma.placementDrive.findMany({
+    include: {
+      company: true,
+    },
+  });
+};
 
 export const getPlacementDriveById=async(id:number)=>{
     return await prisma.placementDrive.findUnique({

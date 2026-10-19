@@ -1,6 +1,39 @@
 
 import type { Request, Response, NextFunction } from "express";
-import { createApplication,getApplications, updateApplicationStatus } from "../models/application.model.js";
+import { createApplication,getApplications, updateApplicationStatus,findEligiblePlacementDrive } from "../models/application.model.js";
+
+
+export const getApplication = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    try {
+        const { role, studentId } = res.locals.auth;
+
+        if (role === "STUDENT" && !studentId) {
+            res.status(403).json({
+                message: "No student profile is linked to this account"
+            });
+            return;
+        }
+
+        const applications =
+            role === "ADMIN" || role === "PLACEMENT_COORDINATOR"
+                ? await getApplications()
+                : role === "STUDENT"
+                    ? await getApplications(studentId)
+                    : [];
+
+        res.status(200).json({
+            message: "Applications fetched successfully",
+            data: applications
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 
 export const addApplication = async (
     req: Request,
@@ -8,27 +41,38 @@ export const addApplication = async (
     next: NextFunction
 ) => {
     try {
-        const { studentId, placementDriveId } = req.body;
+        const { studentId } = res.locals.auth;
+        const { placementDriveId } = req.body;
 
-        if (
-            !Number.isInteger(studentId) ||
-            studentId <= 0 ||
-            !Number.isInteger(placementDriveId) ||
-            placementDriveId <= 0
-        ) {
-            res.status(400).json({
-                message: "Valid studentId and placementDriveId are required"
+        if (!studentId) {
+            res.status(403).json({
+                message: "No student profile is linked to this account"
             });
             return;
         }
 
-        const application = await createApplication(
-            studentId,
-            placementDriveId
-        );
+        const driveId = Number(placementDriveId);
+
+        if (!Number.isInteger(driveId) || driveId <= 0) {
+            res.status(400).json({
+                message: "Valid placement drive ID is required"
+            });
+            return;
+        }
+
+        const drive = await findEligiblePlacementDrive(driveId);
+
+        if (!drive) {
+            res.status(404).json({
+                message: "Placement drive not found or not eligible"
+            });
+            return;
+        }
+
+        const application = await createApplication(studentId, driveId);
 
         res.status(201).json({
-            message: "Application created successfully",
+            message: "Application submitted successfully",
             data: application
         });
     } catch (error) {
@@ -36,23 +80,6 @@ export const addApplication = async (
     }
 };
 
-export const getApplication=async(
-    req:Request,
-    res:Response,
-    next:NextFunction
-)=>{
-try{
-const applications=await getApplications();
-res.status(200).json({
-    message:"Applications fetched successfully",
-    data:applications
-});
-
-}
-catch(error){
-next(error);
-}
-}
 
 export const changeApplicationStatus=async(
     req:Request,

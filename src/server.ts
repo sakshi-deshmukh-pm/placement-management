@@ -8,6 +8,7 @@ import companyRoutes from "./routes/company.routes.js"
 import PlacementDriveRoutes  from "./routes/placementDrive.routes.js";
 import applicationRoutes from "./routes/application.routes.js";
 import authRoutes from "./routes/auth.routes.js";
+import loggerMiddleware from "./middleware/logger.middleware.js";
 
 
 const app = express();
@@ -17,9 +18,7 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.use(express.json());
-
-app.use(middleware);
+app.use(loggerMiddleware);
 
 app.use(studentRoutes);
 

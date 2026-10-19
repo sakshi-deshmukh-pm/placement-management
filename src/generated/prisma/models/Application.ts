@@ -240,8 +240,8 @@ export type ApplicationWhereInput = {
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
-  student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
   placementDrive?: Prisma.XOR<Prisma.PlacementDriveScalarRelationFilter, Prisma.PlacementDriveWhereInput>
+  student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
 }
 
 export type ApplicationOrderByWithRelationInput = {
@@ -252,8 +252,8 @@ export type ApplicationOrderByWithRelationInput = {
   appliedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  student?: Prisma.StudentOrderByWithRelationInput
   placementDrive?: Prisma.PlacementDriveOrderByWithRelationInput
+  student?: Prisma.StudentOrderByWithRelationInput
 }
 
 export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
@@ -268,8 +268,8 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
-  student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
   placementDrive?: Prisma.XOR<Prisma.PlacementDriveScalarRelationFilter, Prisma.PlacementDriveWhereInput>
+  student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
 }, "id" | "studentId_placementDriveId">
 
 export type ApplicationOrderByWithAggregationInput = {
@@ -305,8 +305,8 @@ export type ApplicationCreateInput = {
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
   placementDrive: Prisma.PlacementDriveCreateNestedOneWithoutApplicationsInput
+  student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
 }
 
 export type ApplicationUncheckedCreateInput = {
@@ -324,8 +324,8 @@ export type ApplicationUpdateInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
   placementDrive?: Prisma.PlacementDriveUpdateOneRequiredWithoutApplicationsNestedInput
+  student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
 }
 
 export type ApplicationUncheckedUpdateInput = {
@@ -685,8 +685,8 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   appliedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
+  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
 export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -697,8 +697,8 @@ export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   appliedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
+  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
 export type ApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -709,8 +709,8 @@ export type ApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   appliedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
+  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
 export type ApplicationSelectScalar = {
@@ -725,23 +725,23 @@ export type ApplicationSelectScalar = {
 
 export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "placementDriveId" | "status" | "appliedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
 export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
+  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }
 export type ApplicationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
+  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }
 export type ApplicationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
+  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }
 
 export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Application"
   objects: {
-    student: Prisma.$StudentPayload<ExtArgs>
     placementDrive: Prisma.$PlacementDrivePayload<ExtArgs>
+    student: Prisma.$StudentPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1145,8 +1145,8 @@ readonly fields: ApplicationFieldRefs;
  */
 export interface Prisma__ApplicationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  student<T extends Prisma.StudentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StudentDefaultArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   placementDrive<T extends Prisma.PlacementDriveDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlacementDriveDefaultArgs<ExtArgs>>): Prisma.Prisma__PlacementDriveClient<runtime.Types.Result.GetResult<Prisma.$PlacementDrivePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  student<T extends Prisma.StudentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StudentDefaultArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

@@ -256,8 +256,8 @@ export type PlacementDriveWhereInput = {
   companyId?: Prisma.IntFilter<"PlacementDrive"> | number
   createdAt?: Prisma.DateTimeFilter<"PlacementDrive"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlacementDrive"> | Date | string
-  company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   applications?: Prisma.ApplicationListRelationFilter
+  company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
 }
 
 export type PlacementDriveOrderByWithRelationInput = {
@@ -270,8 +270,8 @@ export type PlacementDriveOrderByWithRelationInput = {
   companyId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  company?: Prisma.CompanyOrderByWithRelationInput
   applications?: Prisma.ApplicationOrderByRelationAggregateInput
+  company?: Prisma.CompanyOrderByWithRelationInput
 }
 
 export type PlacementDriveWhereUniqueInput = Prisma.AtLeast<{
@@ -287,8 +287,8 @@ export type PlacementDriveWhereUniqueInput = Prisma.AtLeast<{
   companyId?: Prisma.IntFilter<"PlacementDrive"> | number
   createdAt?: Prisma.DateTimeFilter<"PlacementDrive"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"PlacementDrive"> | Date | string
-  company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
   applications?: Prisma.ApplicationListRelationFilter
+  company?: Prisma.XOR<Prisma.CompanyScalarRelationFilter, Prisma.CompanyWhereInput>
 }, "id">
 
 export type PlacementDriveOrderByWithAggregationInput = {
@@ -331,8 +331,8 @@ export type PlacementDriveCreateInput = {
   status?: string
   createdAt?: Date | string
   updatedAt?: Date | string
-  company: Prisma.CompanyCreateNestedOneWithoutPlacementDrivesInput
   applications?: Prisma.ApplicationCreateNestedManyWithoutPlacementDriveInput
+  company: Prisma.CompanyCreateNestedOneWithoutPlacementDrivesInput
 }
 
 export type PlacementDriveUncheckedCreateInput = {
@@ -356,8 +356,8 @@ export type PlacementDriveUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  company?: Prisma.CompanyUpdateOneRequiredWithoutPlacementDrivesNestedInput
   applications?: Prisma.ApplicationUpdateManyWithoutPlacementDriveNestedInput
+  company?: Prisma.CompanyUpdateOneRequiredWithoutPlacementDrivesNestedInput
 }
 
 export type PlacementDriveUncheckedUpdateInput = {
@@ -746,8 +746,8 @@ export type PlacementDriveSelect<ExtArgs extends runtime.Types.Extensions.Intern
   companyId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   applications?: boolean | Prisma.PlacementDrive$applicationsArgs<ExtArgs>
+  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.PlacementDriveCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["placementDrive"]>
 
@@ -791,8 +791,8 @@ export type PlacementDriveSelectScalar = {
 
 export type PlacementDriveOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "role" | "package" | "eligibilityCriteria" | "deadline" | "status" | "companyId" | "createdAt" | "updatedAt", ExtArgs["result"]["placementDrive"]>
 export type PlacementDriveInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   applications?: boolean | Prisma.PlacementDrive$applicationsArgs<ExtArgs>
+  company?: boolean | Prisma.CompanyDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.PlacementDriveCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type PlacementDriveIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -805,8 +805,8 @@ export type PlacementDriveIncludeUpdateManyAndReturn<ExtArgs extends runtime.Typ
 export type $PlacementDrivePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "PlacementDrive"
   objects: {
-    company: Prisma.$CompanyPayload<ExtArgs>
     applications: Prisma.$ApplicationPayload<ExtArgs>[]
+    company: Prisma.$CompanyPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -1212,8 +1212,8 @@ readonly fields: PlacementDriveFieldRefs;
  */
 export interface Prisma__PlacementDriveClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   applications<T extends Prisma.PlacementDrive$applicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlacementDrive$applicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  company<T extends Prisma.CompanyDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.CompanyDefaultArgs<ExtArgs>>): Prisma.Prisma__CompanyClient<runtime.Types.Result.GetResult<Prisma.$CompanyPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.

@@ -1,4 +1,3 @@
-
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { findUserById } from "../models/user.model.js";
@@ -67,11 +66,11 @@ export const authenticate = async (
       return;
     }
 
+
     res.locals.auth = {
       id: user.id,
       email: user.email,
       role: user.role,
-      studentId: user.studentId,
     };
 
     next();

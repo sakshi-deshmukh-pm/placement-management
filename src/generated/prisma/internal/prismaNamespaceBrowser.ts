@@ -52,7 +52,6 @@ export const AnyNull = runtime.AnyNull
 
 export const ModelName = {
   User: 'User',
-  Student: 'Student',
   Company: 'Company',
   PlacementDrive: 'PlacementDrive',
   Application: 'Application'
@@ -80,32 +79,21 @@ export const UserScalarFieldEnum = {
   passwordHash: 'passwordHash',
   role: 'role',
   isActive: 'isActive',
-  studentId: 'studentId',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
-
-
-export const StudentScalarFieldEnum = {
-  id: 'id',
   name: 'name',
-  email: 'email',
   phone: 'phone',
-  rollNumber: 'rollNumber',
-  branch: 'branch',
-  year: 'year',
   gender: 'gender',
   dateOfBirth: 'dateOfBirth',
   city: 'city',
   state: 'state',
   pincode: 'pincode',
+  rollNumber: 'rollNumber',
+  branch: 'branch',
+  year: 'year',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type StudentScalarFieldEnum = (typeof StudentScalarFieldEnum)[keyof typeof StudentScalarFieldEnum]
+export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
 export const CompanyScalarFieldEnum = {
@@ -138,7 +126,7 @@ export type PlacementDriveScalarFieldEnum = (typeof PlacementDriveScalarFieldEnu
 
 export const ApplicationScalarFieldEnum = {
   id: 'id',
-  studentId: 'studentId',
+  userId: 'userId',
   placementDriveId: 'placementDriveId',
   status: 'status',
   appliedAt: 'appliedAt',

@@ -2,29 +2,33 @@
 import prisma from "../prisma.js";
 
 export const createApplication = async (
-    studentId: number,
+    userId: number,
     placementDriveId: number
 ) => {
     return await prisma.application.create({
         data: {
-            studentId,
+            userId,
             placementDriveId
         }
     });
 };
 
 export const getApplications = async (
-    studentId?: number
+    userId?: number
 ) => {
     return await prisma.application.findMany({
-        ...(studentId !== undefined ? {
-            where: { studentId }
+        ...(userId !== undefined ? {
+            where: { userId }
         } : {}),
-        select: {
+
+    orderBy: {
+        appliedAt: "desc"
+    },
+         select: {
             id: true,
             status: true,
             appliedAt: true,
-            student: {
+            user: {
                 select: {
                     id: true,
                     name: true,
@@ -50,17 +54,15 @@ export const getApplications = async (
     });
 };
 
-
-export const updateApplicationStatus=async(
-    id:number,
-    status:string
-)=>{
+export const updateApplicationStatus = async (
+    id: number,
+    status: string
+) => {
     return await prisma.application.update({
-        where:{id},
-        data:{status}
+        where: { id },
+        data: { status }
     });
 };
-
 
 export const findEligiblePlacementDrive = async (
     placementDriveId: number

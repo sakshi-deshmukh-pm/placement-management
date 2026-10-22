@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -13,29 +14,25 @@ model User {
   passwordHash String
   role         Role     @default(STUDENT)
   isActive     Boolean  @default(true)
-  studentId    Int?     @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  student      Student? @relation(fields: [studentId], references: [id])
-}
 
-model Student {
-  id           Int           @id @default(autoincrement())
-  name         String
-  email        String        @unique
+  // Personal and profile details
+  name         String?
   phone        String?
-  rollNumber   String        @unique
-  branch       String
-  year         String
   gender       String?
   dateOfBirth  DateTime?
   city         String?
   state        String?
   pincode      String?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+
+  // Student academic details
+  rollNumber   String?  @unique
+  branch       String?
+  year         String?
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
   applications Application[]
-  user         User?
 }
 
 model Company {
@@ -46,6 +43,7 @@ model Company {
   location        String?
   createdAt       DateTime         @default(now())
   updatedAt       DateTime         @updatedAt
+
   placementDrives PlacementDrive[]
 }
 
@@ -59,22 +57,25 @@ model PlacementDrive {
   companyId           Int
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
+
   applications        Application[]
   company             Company       @relation(fields: [companyId], references: [id])
 }
 
 model Application {
   id               Int            @id @default(autoincrement())
-  studentId        Int
+  userId           Int
   placementDriveId Int
   status           String         @default("APPLIED")
   appliedAt        DateTime       @default(now())
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
-  placementDrive   PlacementDrive @relation(fields: [placementDriveId], references: [id])
-  student          Student        @relation(fields: [studentId], references: [id])
 
-  @@unique([studentId, placementDriveId])
+  user             User           @relation(fields: [userId], references: [id])
+  placementDrive   PlacementDrive @relation(fields: [placementDriveId], references: [id])
+
+  // A user can apply only once to each placement drive
+  @@unique([userId, placementDriveId])
 }
 
 enum Role {

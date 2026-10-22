@@ -3,13 +3,11 @@ import type { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-import prisma from "../prisma.js";
 import {
   registerStudentWithProfile,
   findUserForLogin,
-  createAdminUser,
-  findUserById,
-  linkUserToStudent,
+  getUserProfileById,
+  updateUserProfileById,
 } from "../models/user.model.js";
 
 const isPrismaErrorCode = (
@@ -31,6 +29,9 @@ const getJwtSecret = (): string => {
   return secret;
 };
 
+const isValidEmail = (email: string): boolean =>
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
 // POST /auth/register
 export const register = async (
   req: Request,
@@ -44,7 +45,7 @@ export const register = async (
       typeof name !== "string" ||
       !name.trim() ||
       typeof email !== "string" ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ||
+      !isValidEmail(email) ||
       typeof password !== "string" ||
       password.length < 8 ||
       typeof rollNumber !== "string" ||
@@ -55,6 +56,7 @@ export const register = async (
       !year.trim()
     ) {
       res.status(400).json({
+        statusCode: 400,
         message:
           "Name, valid email, password (minimum 8 characters), roll number, branch and year are required.",
       });
@@ -74,15 +76,16 @@ export const register = async (
     });
 
     res.status(201).json({
+      statusCode: 201,
       message: "Registration successful",
       data: {
         user: result.user,
-        student: result.student,
       },
     });
   } catch (error: unknown) {
     if (isPrismaErrorCode(error, "P2002")) {
       res.status(409).json({
+        statusCode: 409,
         message:
           "Email or roll number already exists. Please use unique details.",
       });
@@ -104,12 +107,13 @@ export const login = async (
 
     if (
       typeof email !== "string" ||
-      !email.trim() ||
+      !isValidEmail(email) ||
       typeof password !== "string" ||
       !password
     ) {
       res.status(400).json({
-        message: "Email and password are required.",
+        statusCode: 400,
+        message: "A valid email and password are required.",
       });
       return;
     }
@@ -118,6 +122,7 @@ export const login = async (
 
     if (!user || !(await bcrypt.compare(password, user.passwordHash))) {
       res.status(401).json({
+        statusCode: 401,
         message: "Invalid email or password.",
       });
       return;
@@ -125,12 +130,14 @@ export const login = async (
 
     if (!user.isActive) {
       res.status(403).json({
+        statusCode: 403,
         message: "This account is inactive.",
       });
       return;
     }
 
-    // Must match auth.middleware.ts, which reads decoded.userId.
+    const expiresIn = "1d";
+
     const token = jwt.sign(
       {
         userId: user.id,
@@ -138,18 +145,27 @@ export const login = async (
         role: user.role,
       },
       getJwtSecret(),
-      { expiresIn: "1d", algorithm: "HS256" },
+      {
+        expiresIn,
+        algorithm: "HS256",
+      },
     );
 
     res.status(200).json({
+      statusCode: 200,
       message: "Login successful",
+      tokenType: "Bearer",
+      expiresIn,
       token,
-      user: {
+      data: {
         id: user.id,
+        name: user.name,
         email: user.email,
         role: user.role,
         isActive: user.isActive,
-        studentId: user.studentId,
+        rollNumber: user.rollNumber,
+        branch: user.branch,
+        year: user.year,
       },
     });
   } catch (error: unknown) {
@@ -157,141 +173,153 @@ export const login = async (
   }
 };
 
-// POST /auth/create-admin
-export const createAdmin = async (
-  req: Request,
+// GET /auth/me
+export const getMyProfile = async (
+  _req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const auth = res.locals.auth as { id: number } | undefined;
 
-    if (
-      typeof email !== "string" ||
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ||
-      typeof password !== "string" ||
-      password.length < 8
-    ) {
-      res.status(400).json({
-        message:
-          "A valid email and password of at least 8 characters are required.",
+    if (!auth) {
+      res.status(401).json({
+        statusCode: 401,
+        message: "Authentication required",
       });
       return;
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
-    const existingUser = await findUserForLogin(normalizedEmail);
+    const user = await getUserProfileById(auth.id);
 
-    if (existingUser) {
-      res.status(409).json({
-        message: "An account with this email already exists.",
+    if (!user) {
+      res.status(404).json({
+        statusCode: 404,
+        message: "User profile not found",
       });
       return;
     }
 
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const admin = await createAdminUser({
-      email: normalizedEmail,
-      passwordHash,
-    });
-
-    res.status(201).json({
-      message: "Admin account created successfully.",
-      user: admin,
+    res.status(200).json({
+      statusCode: 200,
+      message: "Profile fetched successfully",
+      data: { user },
     });
   } catch (error: unknown) {
-    if (isPrismaErrorCode(error, "P2002")) {
-      res.status(409).json({
-        message: "An account with this email already exists.",
-      });
-      return;
-    }
-
     next(error);
   }
 };
 
-// PATCH /auth/users/:userId/link-student
-export const linkStudentAccount = async (
+// PATCH /auth/me
+export const updateMyProfile = async (
   req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const userId = Number(req.params.userId);
-    const { studentId } = req.body;
+    const auth = res.locals.auth as { id: number } | undefined;
 
-    if (
-      !Number.isInteger(userId) ||
-      userId <= 0 ||
-      !Number.isInteger(studentId) ||
-      studentId <= 0
-    ) {
-      res.status(400).json({
-        message: "Valid userId and studentId are required.",
+    if (!auth) {
+      res.status(401).json({
+        statusCode: 401,
+        message: "Authentication required",
       });
       return;
     }
 
-    const user = await findUserById(userId);
+    const {
+      name,
+      phone,
+      gender,
+      dateOfBirth,
+      city,
+      state,
+      pincode,
+    } = req.body;
+
+    if (typeof name !== "string" || !name.trim()) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Name is required",
+      });
+      return;
+    }
+
+    let parsedDate: Date | null = null;
+
+    if (
+      dateOfBirth !== null &&
+      dateOfBirth !== undefined &&
+      dateOfBirth !== ""
+    ) {
+      if (
+        typeof dateOfBirth !== "string" ||
+        Number.isNaN(Date.parse(dateOfBirth))
+      ) {
+        res.status(400).json({
+          statusCode: 400,
+          message: "Invalid date of birth",
+        });
+        return;
+      }
+
+      parsedDate = new Date(dateOfBirth);
+    }
+
+    const optionalString = (
+      value: unknown,
+      fieldName: string,
+    ): string | null => {
+      if (value === null || value === undefined || value === "") {
+        return null;
+      }
+
+      if (typeof value !== "string") {
+        throw new Error(`${fieldName} must be a string`);
+      }
+
+      return value.trim() || null;
+    };
+
+    let profileData;
+
+    try {
+      profileData = {
+        name: name.trim(),
+        phone: optionalString(phone, "Phone"),
+        gender: optionalString(gender, "Gender"),
+        dateOfBirth: parsedDate,
+        city: optionalString(city, "City"),
+        state: optionalString(state, "State"),
+        pincode: optionalString(pincode, "Pincode"),
+      };
+    } catch (error: unknown) {
+      res.status(400).json({
+        statusCode: 400,
+        message:
+          error instanceof Error
+            ? error.message
+            : "Invalid profile data",
+      });
+      return;
+    }
+
+    const user = await updateUserProfileById(auth.id, profileData);
 
     if (!user) {
       res.status(404).json({
-        message: "User not found.",
+        statusCode: 404,
+        message: "User profile not found",
       });
       return;
     }
-
-    if (user.role !== "STUDENT") {
-      res.status(400).json({
-        message:
-          "Only student accounts can be linked to a student profile.",
-      });
-      return;
-    }
-
-    if (user.studentId !== null) {
-      res.status(409).json({
-        message: "This user is already linked to a student profile.",
-      });
-      return;
-    }
-
-    const student = await prisma.student.findUnique({
-      where: { id: studentId },
-      select: { id: true },
-    });
-
-    if (!student) {
-      res.status(404).json({
-        message: "Student profile not found.",
-      });
-      return;
-    }
-
-    const linkedUser = await linkUserToStudent(userId, studentId);
 
     res.status(200).json({
-      message: "Student account linked successfully.",
-      user: linkedUser,
+      statusCode: 200,
+      message: "Profile updated successfully",
+      data: { user },
     });
   } catch (error: unknown) {
-    if (isPrismaErrorCode(error, "P2002")) {
-      res.status(409).json({
-        message:
-          "This student profile is already linked to another account.",
-      });
-      return;
-    }
-
-    if (isPrismaErrorCode(error, "P2025")) {
-      res.status(404).json({
-        message: "User or student record was not found.",
-      });
-      return;
-    }
-
     next(error);
   }
 };

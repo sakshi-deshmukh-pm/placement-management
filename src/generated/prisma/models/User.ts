@@ -28,12 +28,10 @@ export type AggregateUser = {
 
 export type UserAvgAggregateOutputType = {
   id: number | null
-  studentId: number | null
 }
 
 export type UserSumAggregateOutputType = {
   id: number | null
-  studentId: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -42,7 +40,16 @@ export type UserMinAggregateOutputType = {
   passwordHash: string | null
   role: $Enums.Role | null
   isActive: boolean | null
-  studentId: number | null
+  name: string | null
+  phone: string | null
+  gender: string | null
+  dateOfBirth: Date | null
+  city: string | null
+  state: string | null
+  pincode: string | null
+  rollNumber: string | null
+  branch: string | null
+  year: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -53,7 +60,16 @@ export type UserMaxAggregateOutputType = {
   passwordHash: string | null
   role: $Enums.Role | null
   isActive: boolean | null
-  studentId: number | null
+  name: string | null
+  phone: string | null
+  gender: string | null
+  dateOfBirth: Date | null
+  city: string | null
+  state: string | null
+  pincode: string | null
+  rollNumber: string | null
+  branch: string | null
+  year: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -64,7 +80,16 @@ export type UserCountAggregateOutputType = {
   passwordHash: number
   role: number
   isActive: number
-  studentId: number
+  name: number
+  phone: number
+  gender: number
+  dateOfBirth: number
+  city: number
+  state: number
+  pincode: number
+  rollNumber: number
+  branch: number
+  year: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -73,12 +98,10 @@ export type UserCountAggregateOutputType = {
 
 export type UserAvgAggregateInputType = {
   id?: true
-  studentId?: true
 }
 
 export type UserSumAggregateInputType = {
   id?: true
-  studentId?: true
 }
 
 export type UserMinAggregateInputType = {
@@ -87,7 +110,16 @@ export type UserMinAggregateInputType = {
   passwordHash?: true
   role?: true
   isActive?: true
-  studentId?: true
+  name?: true
+  phone?: true
+  gender?: true
+  dateOfBirth?: true
+  city?: true
+  state?: true
+  pincode?: true
+  rollNumber?: true
+  branch?: true
+  year?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -98,7 +130,16 @@ export type UserMaxAggregateInputType = {
   passwordHash?: true
   role?: true
   isActive?: true
-  studentId?: true
+  name?: true
+  phone?: true
+  gender?: true
+  dateOfBirth?: true
+  city?: true
+  state?: true
+  pincode?: true
+  rollNumber?: true
+  branch?: true
+  year?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -109,7 +150,16 @@ export type UserCountAggregateInputType = {
   passwordHash?: true
   role?: true
   isActive?: true
-  studentId?: true
+  name?: true
+  phone?: true
+  gender?: true
+  dateOfBirth?: true
+  city?: true
+  state?: true
+  pincode?: true
+  rollNumber?: true
+  branch?: true
+  year?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -207,7 +257,16 @@ export type UserGroupByOutputType = {
   passwordHash: string
   role: $Enums.Role
   isActive: boolean
-  studentId: number | null
+  name: string | null
+  phone: string | null
+  gender: string | null
+  dateOfBirth: Date | null
+  city: string | null
+  state: string | null
+  pincode: string | null
+  rollNumber: string | null
+  branch: string | null
+  year: string | null
   createdAt: Date
   updatedAt: Date
   _count: UserCountAggregateOutputType | null
@@ -241,10 +300,19 @@ export type UserWhereInput = {
   passwordHash?: Prisma.StringFilter<"User"> | string
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   isActive?: Prisma.BoolFilter<"User"> | boolean
-  studentId?: Prisma.IntNullableFilter<"User"> | number | null
+  name?: Prisma.StringNullableFilter<"User"> | string | null
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
+  gender?: Prisma.StringNullableFilter<"User"> | string | null
+  dateOfBirth?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  city?: Prisma.StringNullableFilter<"User"> | string | null
+  state?: Prisma.StringNullableFilter<"User"> | string | null
+  pincode?: Prisma.StringNullableFilter<"User"> | string | null
+  rollNumber?: Prisma.StringNullableFilter<"User"> | string | null
+  branch?: Prisma.StringNullableFilter<"User"> | string | null
+  year?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  student?: Prisma.XOR<Prisma.StudentNullableScalarRelationFilter, Prisma.StudentWhereInput> | null
+  applications?: Prisma.ApplicationListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -253,26 +321,44 @@ export type UserOrderByWithRelationInput = {
   passwordHash?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
-  studentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  name?: Prisma.SortOrderInput | Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  gender?: Prisma.SortOrderInput | Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
+  state?: Prisma.SortOrderInput | Prisma.SortOrder
+  pincode?: Prisma.SortOrderInput | Prisma.SortOrder
+  rollNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  branch?: Prisma.SortOrderInput | Prisma.SortOrder
+  year?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  student?: Prisma.StudentOrderByWithRelationInput
+  applications?: Prisma.ApplicationOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: number
   email?: string
-  studentId?: number
+  rollNumber?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   passwordHash?: Prisma.StringFilter<"User"> | string
   role?: Prisma.EnumRoleFilter<"User"> | $Enums.Role
   isActive?: Prisma.BoolFilter<"User"> | boolean
+  name?: Prisma.StringNullableFilter<"User"> | string | null
+  phone?: Prisma.StringNullableFilter<"User"> | string | null
+  gender?: Prisma.StringNullableFilter<"User"> | string | null
+  dateOfBirth?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
+  city?: Prisma.StringNullableFilter<"User"> | string | null
+  state?: Prisma.StringNullableFilter<"User"> | string | null
+  pincode?: Prisma.StringNullableFilter<"User"> | string | null
+  branch?: Prisma.StringNullableFilter<"User"> | string | null
+  year?: Prisma.StringNullableFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
-  student?: Prisma.XOR<Prisma.StudentNullableScalarRelationFilter, Prisma.StudentWhereInput> | null
-}, "id" | "email" | "studentId">
+  applications?: Prisma.ApplicationListRelationFilter
+}, "id" | "email" | "rollNumber">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -280,7 +366,16 @@ export type UserOrderByWithAggregationInput = {
   passwordHash?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
-  studentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  name?: Prisma.SortOrderInput | Prisma.SortOrder
+  phone?: Prisma.SortOrderInput | Prisma.SortOrder
+  gender?: Prisma.SortOrderInput | Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
+  city?: Prisma.SortOrderInput | Prisma.SortOrder
+  state?: Prisma.SortOrderInput | Prisma.SortOrder
+  pincode?: Prisma.SortOrderInput | Prisma.SortOrder
+  rollNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  branch?: Prisma.SortOrderInput | Prisma.SortOrder
+  year?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
@@ -299,7 +394,16 @@ export type UserScalarWhereWithAggregatesInput = {
   passwordHash?: Prisma.StringWithAggregatesFilter<"User"> | string
   role?: Prisma.EnumRoleWithAggregatesFilter<"User"> | $Enums.Role
   isActive?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
-  studentId?: Prisma.IntNullableWithAggregatesFilter<"User"> | number | null
+  name?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  phone?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  gender?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  dateOfBirth?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+  city?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  state?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  pincode?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  rollNumber?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  branch?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  year?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
 }
@@ -309,9 +413,19 @@ export type UserCreateInput = {
   passwordHash: string
   role?: $Enums.Role
   isActive?: boolean
+  name?: string | null
+  phone?: string | null
+  gender?: string | null
+  dateOfBirth?: Date | string | null
+  city?: string | null
+  state?: string | null
+  pincode?: string | null
+  rollNumber?: string | null
+  branch?: string | null
+  year?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  student?: Prisma.StudentCreateNestedOneWithoutUserInput
+  applications?: Prisma.ApplicationCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -320,9 +434,19 @@ export type UserUncheckedCreateInput = {
   passwordHash: string
   role?: $Enums.Role
   isActive?: boolean
-  studentId?: number | null
+  name?: string | null
+  phone?: string | null
+  gender?: string | null
+  dateOfBirth?: Date | string | null
+  city?: string | null
+  state?: string | null
+  pincode?: string | null
+  rollNumber?: string | null
+  branch?: string | null
+  year?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  applications?: Prisma.ApplicationUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -330,9 +454,19 @@ export type UserUpdateInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  year?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  student?: Prisma.StudentUpdateOneWithoutUserNestedInput
+  applications?: Prisma.ApplicationUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -341,9 +475,19 @@ export type UserUncheckedUpdateInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  studentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  year?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  applications?: Prisma.ApplicationUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -352,7 +496,16 @@ export type UserCreateManyInput = {
   passwordHash: string
   role?: $Enums.Role
   isActive?: boolean
-  studentId?: number | null
+  name?: string | null
+  phone?: string | null
+  gender?: string | null
+  dateOfBirth?: Date | string | null
+  city?: string | null
+  state?: string | null
+  pincode?: string | null
+  rollNumber?: string | null
+  branch?: string | null
+  year?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -362,6 +515,16 @@ export type UserUpdateManyMutationInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  year?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -372,7 +535,16 @@ export type UserUncheckedUpdateManyInput = {
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  studentId?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  year?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -383,14 +555,22 @@ export type UserCountOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  gender?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  pincode?: Prisma.SortOrder
+  rollNumber?: Prisma.SortOrder
+  branch?: Prisma.SortOrder
+  year?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type UserAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -399,7 +579,16 @@ export type UserMaxOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  gender?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  pincode?: Prisma.SortOrder
+  rollNumber?: Prisma.SortOrder
+  branch?: Prisma.SortOrder
+  year?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -410,19 +599,27 @@ export type UserMinOrderByAggregateInput = {
   passwordHash?: Prisma.SortOrder
   role?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
+  name?: Prisma.SortOrder
+  phone?: Prisma.SortOrder
+  gender?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
+  city?: Prisma.SortOrder
+  state?: Prisma.SortOrder
+  pincode?: Prisma.SortOrder
+  rollNumber?: Prisma.SortOrder
+  branch?: Prisma.SortOrder
+  year?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
 
 export type UserSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
 }
 
-export type UserNullableScalarRelationFilter = {
-  is?: Prisma.UserWhereInput | null
-  isNot?: Prisma.UserWhereInput | null
+export type UserScalarRelationFilter = {
+  is?: Prisma.UserWhereInput
+  isNot?: Prisma.UserWhereInput
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -437,6 +634,14 @@ export type BoolFieldUpdateOperationsInput = {
   set?: boolean
 }
 
+export type NullableStringFieldUpdateOperationsInput = {
+  set?: string | null
+}
+
+export type NullableDateTimeFieldUpdateOperationsInput = {
+  set?: Date | string | null
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
 }
@@ -449,100 +654,143 @@ export type IntFieldUpdateOperationsInput = {
   divide?: number
 }
 
-export type NullableIntFieldUpdateOperationsInput = {
-  set?: number | null
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
-export type UserCreateNestedOneWithoutStudentInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutStudentInput, Prisma.UserUncheckedCreateWithoutStudentInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStudentInput
+export type UserCreateNestedOneWithoutApplicationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApplicationsInput, Prisma.UserUncheckedCreateWithoutApplicationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApplicationsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUncheckedCreateNestedOneWithoutStudentInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutStudentInput, Prisma.UserUncheckedCreateWithoutStudentInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStudentInput
+export type UserUpdateOneRequiredWithoutApplicationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutApplicationsInput, Prisma.UserUncheckedCreateWithoutApplicationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutApplicationsInput
+  upsert?: Prisma.UserUpsertWithoutApplicationsInput
   connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutApplicationsInput, Prisma.UserUpdateWithoutApplicationsInput>, Prisma.UserUncheckedUpdateWithoutApplicationsInput>
 }
 
-export type UserUpdateOneWithoutStudentNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutStudentInput, Prisma.UserUncheckedCreateWithoutStudentInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStudentInput
-  upsert?: Prisma.UserUpsertWithoutStudentInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStudentInput, Prisma.UserUpdateWithoutStudentInput>, Prisma.UserUncheckedUpdateWithoutStudentInput>
-}
-
-export type UserUncheckedUpdateOneWithoutStudentNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutStudentInput, Prisma.UserUncheckedCreateWithoutStudentInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStudentInput
-  upsert?: Prisma.UserUpsertWithoutStudentInput
-  disconnect?: Prisma.UserWhereInput | boolean
-  delete?: Prisma.UserWhereInput | boolean
-  connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStudentInput, Prisma.UserUpdateWithoutStudentInput>, Prisma.UserUncheckedUpdateWithoutStudentInput>
-}
-
-export type UserCreateWithoutStudentInput = {
+export type UserCreateWithoutApplicationsInput = {
   email: string
   passwordHash: string
   role?: $Enums.Role
   isActive?: boolean
+  name?: string | null
+  phone?: string | null
+  gender?: string | null
+  dateOfBirth?: Date | string | null
+  city?: string | null
+  state?: string | null
+  pincode?: string | null
+  rollNumber?: string | null
+  branch?: string | null
+  year?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
-export type UserUncheckedCreateWithoutStudentInput = {
+export type UserUncheckedCreateWithoutApplicationsInput = {
   id?: number
   email: string
   passwordHash: string
   role?: $Enums.Role
   isActive?: boolean
+  name?: string | null
+  phone?: string | null
+  gender?: string | null
+  dateOfBirth?: Date | string | null
+  city?: string | null
+  state?: string | null
+  pincode?: string | null
+  rollNumber?: string | null
+  branch?: string | null
+  year?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
-export type UserCreateOrConnectWithoutStudentInput = {
+export type UserCreateOrConnectWithoutApplicationsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutStudentInput, Prisma.UserUncheckedCreateWithoutStudentInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutApplicationsInput, Prisma.UserUncheckedCreateWithoutApplicationsInput>
 }
 
-export type UserUpsertWithoutStudentInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutStudentInput, Prisma.UserUncheckedUpdateWithoutStudentInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutStudentInput, Prisma.UserUncheckedCreateWithoutStudentInput>
+export type UserUpsertWithoutApplicationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutApplicationsInput, Prisma.UserUncheckedUpdateWithoutApplicationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutApplicationsInput, Prisma.UserUncheckedCreateWithoutApplicationsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutStudentInput = {
+export type UserUpdateToOneWithWhereWithoutApplicationsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutStudentInput, Prisma.UserUncheckedUpdateWithoutStudentInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutApplicationsInput, Prisma.UserUncheckedUpdateWithoutApplicationsInput>
 }
 
-export type UserUpdateWithoutStudentInput = {
+export type UserUpdateWithoutApplicationsInput = {
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  year?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type UserUncheckedUpdateWithoutStudentInput = {
+export type UserUncheckedUpdateWithoutApplicationsInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   email?: Prisma.StringFieldUpdateOperationsInput | string
   passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
   role?: Prisma.EnumRoleFieldUpdateOperationsInput | $Enums.Role
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  gender?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  city?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  state?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  pincode?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  rollNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  branch?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  year?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type UserCountOutputType
+ */
+
+export type UserCountOutputType = {
+  applications: number
+}
+
+export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  applications?: boolean | UserCountOutputTypeCountApplicationsArgs
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the UserCountOutputType
+   */
+  select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountApplicationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ApplicationWhereInput
+}
 
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -551,10 +799,20 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   passwordHash?: boolean
   role?: boolean
   isActive?: boolean
-  studentId?: boolean
+  name?: boolean
+  phone?: boolean
+  gender?: boolean
+  dateOfBirth?: boolean
+  city?: boolean
+  state?: boolean
+  pincode?: boolean
+  rollNumber?: boolean
+  branch?: boolean
+  year?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  student?: boolean | Prisma.User$studentArgs<ExtArgs>
+  applications?: boolean | Prisma.User$applicationsArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -563,10 +821,18 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   passwordHash?: boolean
   role?: boolean
   isActive?: boolean
-  studentId?: boolean
+  name?: boolean
+  phone?: boolean
+  gender?: boolean
+  dateOfBirth?: boolean
+  city?: boolean
+  state?: boolean
+  pincode?: boolean
+  rollNumber?: boolean
+  branch?: boolean
+  year?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  student?: boolean | Prisma.User$studentArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -575,10 +841,18 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   passwordHash?: boolean
   role?: boolean
   isActive?: boolean
-  studentId?: boolean
+  name?: boolean
+  phone?: boolean
+  gender?: boolean
+  dateOfBirth?: boolean
+  city?: boolean
+  state?: boolean
+  pincode?: boolean
+  rollNumber?: boolean
+  branch?: boolean
+  year?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  student?: boolean | Prisma.User$studentArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -587,26 +861,32 @@ export type UserSelectScalar = {
   passwordHash?: boolean
   role?: boolean
   isActive?: boolean
-  studentId?: boolean
+  name?: boolean
+  phone?: boolean
+  gender?: boolean
+  dateOfBirth?: boolean
+  city?: boolean
+  state?: boolean
+  pincode?: boolean
+  rollNumber?: boolean
+  branch?: boolean
+  year?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "role" | "isActive" | "studentId" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "role" | "isActive" | "name" | "phone" | "gender" | "dateOfBirth" | "city" | "state" | "pincode" | "rollNumber" | "branch" | "year" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  student?: boolean | Prisma.User$studentArgs<ExtArgs>
+  applications?: boolean | Prisma.User$applicationsArgs<ExtArgs>
+  _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  student?: boolean | Prisma.User$studentArgs<ExtArgs>
-}
-export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  student?: boolean | Prisma.User$studentArgs<ExtArgs>
-}
+export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
 
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "User"
   objects: {
-    student: Prisma.$StudentPayload<ExtArgs> | null
+    applications: Prisma.$ApplicationPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
@@ -614,7 +894,16 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     passwordHash: string
     role: $Enums.Role
     isActive: boolean
-    studentId: number | null
+    name: string | null
+    phone: string | null
+    gender: string | null
+    dateOfBirth: Date | null
+    city: string | null
+    state: string | null
+    pincode: string | null
+    rollNumber: string | null
+    branch: string | null
+    year: string | null
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["user"]>
@@ -1011,7 +1300,7 @@ readonly fields: UserFieldRefs;
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
-  student<T extends Prisma.User$studentArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$studentArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  applications<T extends Prisma.User$applicationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$applicationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ApplicationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1046,7 +1335,16 @@ export interface UserFieldRefs {
   readonly passwordHash: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'Role'>
   readonly isActive: Prisma.FieldRef<"User", 'Boolean'>
-  readonly studentId: Prisma.FieldRef<"User", 'Int'>
+  readonly name: Prisma.FieldRef<"User", 'String'>
+  readonly phone: Prisma.FieldRef<"User", 'String'>
+  readonly gender: Prisma.FieldRef<"User", 'String'>
+  readonly dateOfBirth: Prisma.FieldRef<"User", 'DateTime'>
+  readonly city: Prisma.FieldRef<"User", 'String'>
+  readonly state: Prisma.FieldRef<"User", 'String'>
+  readonly pincode: Prisma.FieldRef<"User", 'String'>
+  readonly rollNumber: Prisma.FieldRef<"User", 'String'>
+  readonly branch: Prisma.FieldRef<"User", 'String'>
+  readonly year: Prisma.FieldRef<"User", 'String'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
 }
@@ -1303,10 +1601,6 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
   skipDuplicates?: boolean
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1377,10 +1671,6 @@ export type UserUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * Limit how many Users to update.
    */
   limit?: number
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.UserIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1450,22 +1740,27 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
 }
 
 /**
- * User.student
+ * User.applications
  */
-export type User$studentArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+export type User$applicationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   /**
-   * Select specific fields to fetch from the Student
+   * Select specific fields to fetch from the Application
    */
-  select?: Prisma.StudentSelect<ExtArgs> | null
+  select?: Prisma.ApplicationSelect<ExtArgs> | null
   /**
-   * Omit specific fields from the Student
+   * Omit specific fields from the Application
    */
-  omit?: Prisma.StudentOmit<ExtArgs> | null
+  omit?: Prisma.ApplicationOmit<ExtArgs> | null
   /**
    * Choose, which related nodes to fetch as well
    */
-  include?: Prisma.StudentInclude<ExtArgs> | null
-  where?: Prisma.StudentWhereInput
+  include?: Prisma.ApplicationInclude<ExtArgs> | null
+  where?: Prisma.ApplicationWhereInput
+  orderBy?: Prisma.ApplicationOrderByWithRelationInput | Prisma.ApplicationOrderByWithRelationInput[]
+  cursor?: Prisma.ApplicationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ApplicationScalarFieldEnum | Prisma.ApplicationScalarFieldEnum[]
 }
 
 /**

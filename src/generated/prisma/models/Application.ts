@@ -28,19 +28,19 @@ export type AggregateApplication = {
 
 export type ApplicationAvgAggregateOutputType = {
   id: number | null
-  studentId: number | null
+  userId: number | null
   placementDriveId: number | null
 }
 
 export type ApplicationSumAggregateOutputType = {
   id: number | null
-  studentId: number | null
+  userId: number | null
   placementDriveId: number | null
 }
 
 export type ApplicationMinAggregateOutputType = {
   id: number | null
-  studentId: number | null
+  userId: number | null
   placementDriveId: number | null
   status: string | null
   appliedAt: Date | null
@@ -50,7 +50,7 @@ export type ApplicationMinAggregateOutputType = {
 
 export type ApplicationMaxAggregateOutputType = {
   id: number | null
-  studentId: number | null
+  userId: number | null
   placementDriveId: number | null
   status: string | null
   appliedAt: Date | null
@@ -60,7 +60,7 @@ export type ApplicationMaxAggregateOutputType = {
 
 export type ApplicationCountAggregateOutputType = {
   id: number
-  studentId: number
+  userId: number
   placementDriveId: number
   status: number
   appliedAt: number
@@ -72,19 +72,19 @@ export type ApplicationCountAggregateOutputType = {
 
 export type ApplicationAvgAggregateInputType = {
   id?: true
-  studentId?: true
+  userId?: true
   placementDriveId?: true
 }
 
 export type ApplicationSumAggregateInputType = {
   id?: true
-  studentId?: true
+  userId?: true
   placementDriveId?: true
 }
 
 export type ApplicationMinAggregateInputType = {
   id?: true
-  studentId?: true
+  userId?: true
   placementDriveId?: true
   status?: true
   appliedAt?: true
@@ -94,7 +94,7 @@ export type ApplicationMinAggregateInputType = {
 
 export type ApplicationMaxAggregateInputType = {
   id?: true
-  studentId?: true
+  userId?: true
   placementDriveId?: true
   status?: true
   appliedAt?: true
@@ -104,7 +104,7 @@ export type ApplicationMaxAggregateInputType = {
 
 export type ApplicationCountAggregateInputType = {
   id?: true
-  studentId?: true
+  userId?: true
   placementDriveId?: true
   status?: true
   appliedAt?: true
@@ -201,7 +201,7 @@ export type ApplicationGroupByArgs<ExtArgs extends runtime.Types.Extensions.Inte
 
 export type ApplicationGroupByOutputType = {
   id: number
-  studentId: number
+  userId: number
   placementDriveId: number
   status: string
   appliedAt: Date
@@ -234,47 +234,47 @@ export type ApplicationWhereInput = {
   OR?: Prisma.ApplicationWhereInput[]
   NOT?: Prisma.ApplicationWhereInput | Prisma.ApplicationWhereInput[]
   id?: Prisma.IntFilter<"Application"> | number
-  studentId?: Prisma.IntFilter<"Application"> | number
+  userId?: Prisma.IntFilter<"Application"> | number
   placementDriveId?: Prisma.IntFilter<"Application"> | number
   status?: Prisma.StringFilter<"Application"> | string
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   placementDrive?: Prisma.XOR<Prisma.PlacementDriveScalarRelationFilter, Prisma.PlacementDriveWhereInput>
-  student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
 }
 
 export type ApplicationOrderByWithRelationInput = {
   id?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   placementDriveId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   appliedAt?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  user?: Prisma.UserOrderByWithRelationInput
   placementDrive?: Prisma.PlacementDriveOrderByWithRelationInput
-  student?: Prisma.StudentOrderByWithRelationInput
 }
 
 export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   id?: number
-  studentId_placementDriveId?: Prisma.ApplicationStudentIdPlacementDriveIdCompoundUniqueInput
+  userId_placementDriveId?: Prisma.ApplicationUserIdPlacementDriveIdCompoundUniqueInput
   AND?: Prisma.ApplicationWhereInput | Prisma.ApplicationWhereInput[]
   OR?: Prisma.ApplicationWhereInput[]
   NOT?: Prisma.ApplicationWhereInput | Prisma.ApplicationWhereInput[]
-  studentId?: Prisma.IntFilter<"Application"> | number
+  userId?: Prisma.IntFilter<"Application"> | number
   placementDriveId?: Prisma.IntFilter<"Application"> | number
   status?: Prisma.StringFilter<"Application"> | string
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
+  user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   placementDrive?: Prisma.XOR<Prisma.PlacementDriveScalarRelationFilter, Prisma.PlacementDriveWhereInput>
-  student?: Prisma.XOR<Prisma.StudentScalarRelationFilter, Prisma.StudentWhereInput>
-}, "id" | "studentId_placementDriveId">
+}, "id" | "userId_placementDriveId">
 
 export type ApplicationOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   placementDriveId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   appliedAt?: Prisma.SortOrder
@@ -292,7 +292,7 @@ export type ApplicationScalarWhereWithAggregatesInput = {
   OR?: Prisma.ApplicationScalarWhereWithAggregatesInput[]
   NOT?: Prisma.ApplicationScalarWhereWithAggregatesInput | Prisma.ApplicationScalarWhereWithAggregatesInput[]
   id?: Prisma.IntWithAggregatesFilter<"Application"> | number
-  studentId?: Prisma.IntWithAggregatesFilter<"Application"> | number
+  userId?: Prisma.IntWithAggregatesFilter<"Application"> | number
   placementDriveId?: Prisma.IntWithAggregatesFilter<"Application"> | number
   status?: Prisma.StringWithAggregatesFilter<"Application"> | string
   appliedAt?: Prisma.DateTimeWithAggregatesFilter<"Application"> | Date | string
@@ -305,13 +305,13 @@ export type ApplicationCreateInput = {
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutApplicationsInput
   placementDrive: Prisma.PlacementDriveCreateNestedOneWithoutApplicationsInput
-  student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
 }
 
 export type ApplicationUncheckedCreateInput = {
   id?: number
-  studentId: number
+  userId: number
   placementDriveId: number
   status?: string
   appliedAt?: Date | string
@@ -324,13 +324,13 @@ export type ApplicationUpdateInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutApplicationsNestedInput
   placementDrive?: Prisma.PlacementDriveUpdateOneRequiredWithoutApplicationsNestedInput
-  student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
 }
 
 export type ApplicationUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  studentId?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
   placementDriveId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -340,7 +340,7 @@ export type ApplicationUncheckedUpdateInput = {
 
 export type ApplicationCreateManyInput = {
   id?: number
-  studentId: number
+  userId: number
   placementDriveId: number
   status?: string
   appliedAt?: Date | string
@@ -357,7 +357,7 @@ export type ApplicationUpdateManyMutationInput = {
 
 export type ApplicationUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  studentId?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
   placementDriveId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -375,14 +375,14 @@ export type ApplicationOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
-export type ApplicationStudentIdPlacementDriveIdCompoundUniqueInput = {
-  studentId: number
+export type ApplicationUserIdPlacementDriveIdCompoundUniqueInput = {
+  userId: number
   placementDriveId: number
 }
 
 export type ApplicationCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   placementDriveId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   appliedAt?: Prisma.SortOrder
@@ -392,13 +392,13 @@ export type ApplicationCountOrderByAggregateInput = {
 
 export type ApplicationAvgOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   placementDriveId?: Prisma.SortOrder
 }
 
 export type ApplicationMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   placementDriveId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   appliedAt?: Prisma.SortOrder
@@ -408,7 +408,7 @@ export type ApplicationMaxOrderByAggregateInput = {
 
 export type ApplicationMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   placementDriveId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   appliedAt?: Prisma.SortOrder
@@ -418,49 +418,49 @@ export type ApplicationMinOrderByAggregateInput = {
 
 export type ApplicationSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
-  studentId?: Prisma.SortOrder
+  userId?: Prisma.SortOrder
   placementDriveId?: Prisma.SortOrder
 }
 
-export type ApplicationCreateNestedManyWithoutStudentInput = {
-  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutStudentInput, Prisma.ApplicationUncheckedCreateWithoutStudentInput> | Prisma.ApplicationCreateWithoutStudentInput[] | Prisma.ApplicationUncheckedCreateWithoutStudentInput[]
-  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutStudentInput | Prisma.ApplicationCreateOrConnectWithoutStudentInput[]
-  createMany?: Prisma.ApplicationCreateManyStudentInputEnvelope
+export type ApplicationCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutUserInput, Prisma.ApplicationUncheckedCreateWithoutUserInput> | Prisma.ApplicationCreateWithoutUserInput[] | Prisma.ApplicationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutUserInput | Prisma.ApplicationCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ApplicationCreateManyUserInputEnvelope
   connect?: Prisma.ApplicationWhereUniqueInput | Prisma.ApplicationWhereUniqueInput[]
 }
 
-export type ApplicationUncheckedCreateNestedManyWithoutStudentInput = {
-  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutStudentInput, Prisma.ApplicationUncheckedCreateWithoutStudentInput> | Prisma.ApplicationCreateWithoutStudentInput[] | Prisma.ApplicationUncheckedCreateWithoutStudentInput[]
-  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutStudentInput | Prisma.ApplicationCreateOrConnectWithoutStudentInput[]
-  createMany?: Prisma.ApplicationCreateManyStudentInputEnvelope
+export type ApplicationUncheckedCreateNestedManyWithoutUserInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutUserInput, Prisma.ApplicationUncheckedCreateWithoutUserInput> | Prisma.ApplicationCreateWithoutUserInput[] | Prisma.ApplicationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutUserInput | Prisma.ApplicationCreateOrConnectWithoutUserInput[]
+  createMany?: Prisma.ApplicationCreateManyUserInputEnvelope
   connect?: Prisma.ApplicationWhereUniqueInput | Prisma.ApplicationWhereUniqueInput[]
 }
 
-export type ApplicationUpdateManyWithoutStudentNestedInput = {
-  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutStudentInput, Prisma.ApplicationUncheckedCreateWithoutStudentInput> | Prisma.ApplicationCreateWithoutStudentInput[] | Prisma.ApplicationUncheckedCreateWithoutStudentInput[]
-  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutStudentInput | Prisma.ApplicationCreateOrConnectWithoutStudentInput[]
-  upsert?: Prisma.ApplicationUpsertWithWhereUniqueWithoutStudentInput | Prisma.ApplicationUpsertWithWhereUniqueWithoutStudentInput[]
-  createMany?: Prisma.ApplicationCreateManyStudentInputEnvelope
+export type ApplicationUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutUserInput, Prisma.ApplicationUncheckedCreateWithoutUserInput> | Prisma.ApplicationCreateWithoutUserInput[] | Prisma.ApplicationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutUserInput | Prisma.ApplicationCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ApplicationUpsertWithWhereUniqueWithoutUserInput | Prisma.ApplicationUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ApplicationCreateManyUserInputEnvelope
   set?: Prisma.ApplicationWhereUniqueInput | Prisma.ApplicationWhereUniqueInput[]
   disconnect?: Prisma.ApplicationWhereUniqueInput | Prisma.ApplicationWhereUniqueInput[]
   delete?: Prisma.ApplicationWhereUniqueInput | Prisma.ApplicationWhereUniqueInput[]
   connect?: Prisma.ApplicationWhereUniqueInput | Prisma.ApplicationWhereUniqueInput[]
-  update?: Prisma.ApplicationUpdateWithWhereUniqueWithoutStudentInput | Prisma.ApplicationUpdateWithWhereUniqueWithoutStudentInput[]
-  updateMany?: Prisma.ApplicationUpdateManyWithWhereWithoutStudentInput | Prisma.ApplicationUpdateManyWithWhereWithoutStudentInput[]
+  update?: Prisma.ApplicationUpdateWithWhereUniqueWithoutUserInput | Prisma.ApplicationUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ApplicationUpdateManyWithWhereWithoutUserInput | Prisma.ApplicationUpdateManyWithWhereWithoutUserInput[]
   deleteMany?: Prisma.ApplicationScalarWhereInput | Prisma.ApplicationScalarWhereInput[]
 }
 
-export type ApplicationUncheckedUpdateManyWithoutStudentNestedInput = {
-  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutStudentInput, Prisma.ApplicationUncheckedCreateWithoutStudentInput> | Prisma.ApplicationCreateWithoutStudentInput[] | Prisma.ApplicationUncheckedCreateWithoutStudentInput[]
-  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutStudentInput | Prisma.ApplicationCreateOrConnectWithoutStudentInput[]
-  upsert?: Prisma.ApplicationUpsertWithWhereUniqueWithoutStudentInput | Prisma.ApplicationUpsertWithWhereUniqueWithoutStudentInput[]
-  createMany?: Prisma.ApplicationCreateManyStudentInputEnvelope
+export type ApplicationUncheckedUpdateManyWithoutUserNestedInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutUserInput, Prisma.ApplicationUncheckedCreateWithoutUserInput> | Prisma.ApplicationCreateWithoutUserInput[] | Prisma.ApplicationUncheckedCreateWithoutUserInput[]
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutUserInput | Prisma.ApplicationCreateOrConnectWithoutUserInput[]
+  upsert?: Prisma.ApplicationUpsertWithWhereUniqueWithoutUserInput | Prisma.ApplicationUpsertWithWhereUniqueWithoutUserInput[]
+  createMany?: Prisma.ApplicationCreateManyUserInputEnvelope
   set?: Prisma.ApplicationWhereUniqueInput | Prisma.ApplicationWhereUniqueInput[]
   disconnect?: Prisma.ApplicationWhereUniqueInput | Prisma.ApplicationWhereUniqueInput[]
   delete?: Prisma.ApplicationWhereUniqueInput | Prisma.ApplicationWhereUniqueInput[]
   connect?: Prisma.ApplicationWhereUniqueInput | Prisma.ApplicationWhereUniqueInput[]
-  update?: Prisma.ApplicationUpdateWithWhereUniqueWithoutStudentInput | Prisma.ApplicationUpdateWithWhereUniqueWithoutStudentInput[]
-  updateMany?: Prisma.ApplicationUpdateManyWithWhereWithoutStudentInput | Prisma.ApplicationUpdateManyWithWhereWithoutStudentInput[]
+  update?: Prisma.ApplicationUpdateWithWhereUniqueWithoutUserInput | Prisma.ApplicationUpdateWithWhereUniqueWithoutUserInput[]
+  updateMany?: Prisma.ApplicationUpdateManyWithWhereWithoutUserInput | Prisma.ApplicationUpdateManyWithWhereWithoutUserInput[]
   deleteMany?: Prisma.ApplicationScalarWhereInput | Prisma.ApplicationScalarWhereInput[]
 }
 
@@ -506,7 +506,7 @@ export type ApplicationUncheckedUpdateManyWithoutPlacementDriveNestedInput = {
   deleteMany?: Prisma.ApplicationScalarWhereInput | Prisma.ApplicationScalarWhereInput[]
 }
 
-export type ApplicationCreateWithoutStudentInput = {
+export type ApplicationCreateWithoutUserInput = {
   status?: string
   appliedAt?: Date | string
   createdAt?: Date | string
@@ -514,7 +514,7 @@ export type ApplicationCreateWithoutStudentInput = {
   placementDrive: Prisma.PlacementDriveCreateNestedOneWithoutApplicationsInput
 }
 
-export type ApplicationUncheckedCreateWithoutStudentInput = {
+export type ApplicationUncheckedCreateWithoutUserInput = {
   id?: number
   placementDriveId: number
   status?: string
@@ -523,30 +523,30 @@ export type ApplicationUncheckedCreateWithoutStudentInput = {
   updatedAt?: Date | string
 }
 
-export type ApplicationCreateOrConnectWithoutStudentInput = {
+export type ApplicationCreateOrConnectWithoutUserInput = {
   where: Prisma.ApplicationWhereUniqueInput
-  create: Prisma.XOR<Prisma.ApplicationCreateWithoutStudentInput, Prisma.ApplicationUncheckedCreateWithoutStudentInput>
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutUserInput, Prisma.ApplicationUncheckedCreateWithoutUserInput>
 }
 
-export type ApplicationCreateManyStudentInputEnvelope = {
-  data: Prisma.ApplicationCreateManyStudentInput | Prisma.ApplicationCreateManyStudentInput[]
+export type ApplicationCreateManyUserInputEnvelope = {
+  data: Prisma.ApplicationCreateManyUserInput | Prisma.ApplicationCreateManyUserInput[]
   skipDuplicates?: boolean
 }
 
-export type ApplicationUpsertWithWhereUniqueWithoutStudentInput = {
+export type ApplicationUpsertWithWhereUniqueWithoutUserInput = {
   where: Prisma.ApplicationWhereUniqueInput
-  update: Prisma.XOR<Prisma.ApplicationUpdateWithoutStudentInput, Prisma.ApplicationUncheckedUpdateWithoutStudentInput>
-  create: Prisma.XOR<Prisma.ApplicationCreateWithoutStudentInput, Prisma.ApplicationUncheckedCreateWithoutStudentInput>
+  update: Prisma.XOR<Prisma.ApplicationUpdateWithoutUserInput, Prisma.ApplicationUncheckedUpdateWithoutUserInput>
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutUserInput, Prisma.ApplicationUncheckedCreateWithoutUserInput>
 }
 
-export type ApplicationUpdateWithWhereUniqueWithoutStudentInput = {
+export type ApplicationUpdateWithWhereUniqueWithoutUserInput = {
   where: Prisma.ApplicationWhereUniqueInput
-  data: Prisma.XOR<Prisma.ApplicationUpdateWithoutStudentInput, Prisma.ApplicationUncheckedUpdateWithoutStudentInput>
+  data: Prisma.XOR<Prisma.ApplicationUpdateWithoutUserInput, Prisma.ApplicationUncheckedUpdateWithoutUserInput>
 }
 
-export type ApplicationUpdateManyWithWhereWithoutStudentInput = {
+export type ApplicationUpdateManyWithWhereWithoutUserInput = {
   where: Prisma.ApplicationScalarWhereInput
-  data: Prisma.XOR<Prisma.ApplicationUpdateManyMutationInput, Prisma.ApplicationUncheckedUpdateManyWithoutStudentInput>
+  data: Prisma.XOR<Prisma.ApplicationUpdateManyMutationInput, Prisma.ApplicationUncheckedUpdateManyWithoutUserInput>
 }
 
 export type ApplicationScalarWhereInput = {
@@ -554,7 +554,7 @@ export type ApplicationScalarWhereInput = {
   OR?: Prisma.ApplicationScalarWhereInput[]
   NOT?: Prisma.ApplicationScalarWhereInput | Prisma.ApplicationScalarWhereInput[]
   id?: Prisma.IntFilter<"Application"> | number
-  studentId?: Prisma.IntFilter<"Application"> | number
+  userId?: Prisma.IntFilter<"Application"> | number
   placementDriveId?: Prisma.IntFilter<"Application"> | number
   status?: Prisma.StringFilter<"Application"> | string
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
@@ -567,12 +567,12 @@ export type ApplicationCreateWithoutPlacementDriveInput = {
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
-  student: Prisma.StudentCreateNestedOneWithoutApplicationsInput
+  user: Prisma.UserCreateNestedOneWithoutApplicationsInput
 }
 
 export type ApplicationUncheckedCreateWithoutPlacementDriveInput = {
   id?: number
-  studentId: number
+  userId: number
   status?: string
   appliedAt?: Date | string
   createdAt?: Date | string
@@ -605,7 +605,7 @@ export type ApplicationUpdateManyWithWhereWithoutPlacementDriveInput = {
   data: Prisma.XOR<Prisma.ApplicationUpdateManyMutationInput, Prisma.ApplicationUncheckedUpdateManyWithoutPlacementDriveInput>
 }
 
-export type ApplicationCreateManyStudentInput = {
+export type ApplicationCreateManyUserInput = {
   id?: number
   placementDriveId: number
   status?: string
@@ -614,7 +614,7 @@ export type ApplicationCreateManyStudentInput = {
   updatedAt?: Date | string
 }
 
-export type ApplicationUpdateWithoutStudentInput = {
+export type ApplicationUpdateWithoutUserInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -622,7 +622,7 @@ export type ApplicationUpdateWithoutStudentInput = {
   placementDrive?: Prisma.PlacementDriveUpdateOneRequiredWithoutApplicationsNestedInput
 }
 
-export type ApplicationUncheckedUpdateWithoutStudentInput = {
+export type ApplicationUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   placementDriveId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -631,7 +631,7 @@ export type ApplicationUncheckedUpdateWithoutStudentInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
-export type ApplicationUncheckedUpdateManyWithoutStudentInput = {
+export type ApplicationUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   placementDriveId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
@@ -642,7 +642,7 @@ export type ApplicationUncheckedUpdateManyWithoutStudentInput = {
 
 export type ApplicationCreateManyPlacementDriveInput = {
   id?: number
-  studentId: number
+  userId: number
   status?: string
   appliedAt?: Date | string
   createdAt?: Date | string
@@ -654,12 +654,12 @@ export type ApplicationUpdateWithoutPlacementDriveInput = {
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  student?: Prisma.StudentUpdateOneRequiredWithoutApplicationsNestedInput
+  user?: Prisma.UserUpdateOneRequiredWithoutApplicationsNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutPlacementDriveInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  studentId?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -668,7 +668,7 @@ export type ApplicationUncheckedUpdateWithoutPlacementDriveInput = {
 
 export type ApplicationUncheckedUpdateManyWithoutPlacementDriveInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
-  studentId?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.StringFieldUpdateOperationsInput | string
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -679,43 +679,43 @@ export type ApplicationUncheckedUpdateManyWithoutPlacementDriveInput = {
 
 export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  studentId?: boolean
+  userId?: boolean
   placementDriveId?: boolean
   status?: boolean
   appliedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
 export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  studentId?: boolean
+  userId?: boolean
   placementDriveId?: boolean
   status?: boolean
   appliedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
 export type ApplicationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
-  studentId?: boolean
+  userId?: boolean
   placementDriveId?: boolean
   status?: boolean
   appliedAt?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
 export type ApplicationSelectScalar = {
   id?: boolean
-  studentId?: boolean
+  userId?: boolean
   placementDriveId?: boolean
   status?: boolean
   appliedAt?: boolean
@@ -723,29 +723,29 @@ export type ApplicationSelectScalar = {
   updatedAt?: boolean
 }
 
-export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "placementDriveId" | "status" | "appliedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
+export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "placementDriveId" | "status" | "appliedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["application"]>
 export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }
 export type ApplicationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }
 export type ApplicationIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
-  student?: boolean | Prisma.StudentDefaultArgs<ExtArgs>
 }
 
 export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Application"
   objects: {
+    user: Prisma.$UserPayload<ExtArgs>
     placementDrive: Prisma.$PlacementDrivePayload<ExtArgs>
-    student: Prisma.$StudentPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
-    studentId: number
+    userId: number
     placementDriveId: number
     status: string
     appliedAt: Date
@@ -1145,8 +1145,8 @@ readonly fields: ApplicationFieldRefs;
  */
 export interface Prisma__ApplicationClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   placementDrive<T extends Prisma.PlacementDriveDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlacementDriveDefaultArgs<ExtArgs>>): Prisma.Prisma__PlacementDriveClient<runtime.Types.Result.GetResult<Prisma.$PlacementDrivePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  student<T extends Prisma.StudentDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.StudentDefaultArgs<ExtArgs>>): Prisma.Prisma__StudentClient<runtime.Types.Result.GetResult<Prisma.$StudentPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1177,7 +1177,7 @@ export interface Prisma__ApplicationClient<T, Null = never, ExtArgs extends runt
  */
 export interface ApplicationFieldRefs {
   readonly id: Prisma.FieldRef<"Application", 'Int'>
-  readonly studentId: Prisma.FieldRef<"Application", 'Int'>
+  readonly userId: Prisma.FieldRef<"Application", 'Int'>
   readonly placementDriveId: Prisma.FieldRef<"Application", 'Int'>
   readonly status: Prisma.FieldRef<"Application", 'String'>
   readonly appliedAt: Prisma.FieldRef<"Application", 'DateTime'>

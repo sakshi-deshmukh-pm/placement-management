@@ -1,123 +1,227 @@
-import type { NextFunction, Request, Response } from "express";
-import { Prisma } from "../generated/prisma/client.js";
-import prisma from "../prisma.js";
 
-const isValidId = (id: number) =>
-  Number.isInteger(id) && id > 0;
+import type { Request, Response, NextFunction } from "express";
+import bcrypt from "bcrypt";
+import type { Prisma } from "../generated/prisma/client.js";
 
-const isNonEmptyString = (value: unknown): value is string =>
-  typeof value === "string" && value.trim().length > 0;
-
-type UserRole =
-  | "ADMIN"
-  | "STUDENT"
-  | "PLACEMENT_COORDINATOR"
-  | "RECRUITER";
-
-type AuthUser = {
-  id: number;
-  email: string;
-  role: UserRole;
-  studentId: number | null;
-};
-
-const studentEditableFields = new Set([
-  "name",
-  "phone",
-  "gender",
-  "dateOfBirth",
-  "city",
-  "state",
-  "pincode",
-]);
-
-const hasRestrictedStudentFields = (
-  body: Record<string, unknown>
-) =>
-  Object.keys(body).some(
-    (field) => !studentEditableFields.has(field)
-  );
-
-const handleDatabaseError = (
-  error: unknown,
-  res: Response,
-  next: NextFunction
-) => {
-  if (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === "P2002"
-  ) {
-    res.status(409).json({
-      message: "Email or roll number already exists",
-    });
-    return;
-  }
-
-  next(error);
-};
+import {
+  getAllStudents,
+  countStudents,
+  getStudentById as findStudentById,
+  createStudent,
+  updateStudent as updateStudentModel,
+  deleteStudent as deleteStudentModel,
+  type StudentSortField,
+  type SortOrder,
+} from "../models/student.model.js";
 
 // GET /students
 export const getStudents = async (
   req: Request,
   res: Response,
-  next: NextFunction
-) => {
-  const page = Math.max(1, Number(req.query.page) || 1);
-
-  const limit = Math.min(
-    100,
-    Math.max(1, Number(req.query.limit) || 10)
-  );
-
-  const skip = (page - 1) * limit;
-  const search = String(req.query.search || "").trim();
-  const branch = String(req.query.branch || "").trim();
-  const year = String(req.query.year || "").trim();
-
-  const where: Prisma.StudentWhereInput = {
-    ...(search && {
-      name: {
-        contains: search,
-        mode: "insensitive",
-      },
-    }),
-    ...(branch && {
-      branch: {
-        equals: branch,
-        mode: "insensitive",
-      },
-    }),
-    ...(year && {
-      year: {
-        equals: year,
-        mode: "insensitive",
-      },
-    }),
-  };
-
+  next: NextFunction,
+): Promise<void> => {
   try {
+    const pageValue = req.query.page ?? "1";
+    const pageSizeValue = req.query.pageSize ?? req.query.limit ?? "10";
+
+    if (
+      typeof pageValue !== "string" ||
+      typeof pageSizeValue !== "string" ||
+      !/^\d+$/.test(pageValue) ||
+      !/^\d+$/.test(pageSizeValue)
+    ) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Page and pageSize must be positive integers",
+      });
+      return;
+    }
+
+    const page = Number(pageValue);
+    const pageSize = Number(pageSizeValue);
+
+    if (
+      !Number.isSafeInteger(page) ||
+      page < 1 ||
+      !Number.isSafeInteger(pageSize) ||
+      pageSize < 1 ||
+      pageSize > 100
+    ) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Page must be positive and pageSize must be between 1 and 100",
+      });
+      return;
+    }
+
+    const allowedSortFields: StudentSortField[] = [
+      "id",
+      "name",
+      "email",
+      "rollNumber",
+      "branch",
+      "year",
+      "city",
+    ];
+
+    const sortByValue = req.query.sortBy ?? "id";
+    const sortOrderValue = req.query.sortOrder ?? "asc";
+
+    if (
+      typeof sortByValue !== "string" ||
+      !allowedSortFields.includes(sortByValue as StudentSortField)
+    ) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Invalid sortBy field",
+        allowedFields: allowedSortFields,
+      });
+      return;
+    }
+
+    if (
+      typeof sortOrderValue !== "string" ||
+      !["asc", "desc"].includes(sortOrderValue)
+    ) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "sortOrder must be either asc or desc",
+      });
+      return;
+    }
+
+    const sortBy = sortByValue as StudentSortField;
+    const sortOrder = sortOrderValue as SortOrder;
+
+    const where: Prisma.UserWhereInput = {
+      role: "STUDENT",
+    };
+
+    // Search by name, email, or roll number.
+    if (req.query.search !== undefined) {
+      if (typeof req.query.search !== "string") {
+        res.status(400).json({
+          statusCode: 400,
+          message: "Search must be a string",
+        });
+        return;
+      }
+
+      const search = req.query.search.trim();
+
+      if (search) {
+        where.OR = [
+          {
+            name: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+          {
+            email: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+          {
+            rollNumber: {
+              contains: search,
+              mode: "insensitive",
+            },
+          },
+        ];
+      }
+    }
+
+    // Filter by branch.
+    if (req.query.branch !== undefined) {
+      if (typeof req.query.branch !== "string") {
+        res.status(400).json({
+          statusCode: 400,
+          message: "Branch must be a string",
+        });
+        return;
+      }
+
+      const branch = req.query.branch.trim();
+
+      if (branch) {
+        where.branch = {
+          equals: branch,
+          mode: "insensitive",
+        };
+      }
+    }
+
+    // Filter by year.
+    if (req.query.year !== undefined) {
+      if (typeof req.query.year !== "string") {
+        res.status(400).json({
+          statusCode: 400,
+          message: "Year must be a string",
+        });
+        return;
+      }
+
+      const year = req.query.year.trim();
+
+      if (year) {
+        where.year = year;
+      }
+    }
+
+    // Filter by city.
+    if (req.query.city !== undefined) {
+      if (typeof req.query.city !== "string") {
+        res.status(400).json({
+          statusCode: 400,
+          message: "City must be a string",
+        });
+        return;
+      }
+
+      const city = req.query.city.trim();
+
+      if (city) {
+        where.city = {
+          equals: city,
+          mode: "insensitive",
+        };
+      }
+    }
+
+    const skip = (page - 1) * pageSize;
+
+    if (!Number.isSafeInteger(skip)) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Requested page is too large",
+      });
+      return;
+    }
+
     const [students, total] = await Promise.all([
-      prisma.student.findMany({
-        where,
-        skip,
-        take: limit,
-        orderBy: {
-          id: "asc",
-        },
-      }),
-      prisma.student.count({ where }),
+      getAllStudents(where, skip, pageSize, sortBy, sortOrder),
+      countStudents(where),
     ]);
 
-    res.json({
+    res.status(200).json({
+      statusCode: 200,
+      message: "Students fetched successfully",
       data: students,
       pagination: {
         page,
-        limit,
+        pageSize,
+        limit: pageSize,
         total,
-        totalPages: Math.ceil(total / limit),
+        totalPages: Math.ceil(total / pageSize),
+      },
+      sorting: {
+        sortBy,
+        sortOrder,
       },
     });
-  } catch (error) {
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -126,94 +230,99 @@ export const getStudents = async (
 export const addStudent = async (
   req: Request,
   res: Response,
-  next: NextFunction
-) => {
-  const {
-    name,
-    email,
-    phone,
-    rollNumber,
-    branch,
-    year,
-    gender,
-    dateOfBirth,
-    city,
-    state,
-    pincode,
-  } = req.body;
-
-  if (
-    !isNonEmptyString(name) ||
-    !isNonEmptyString(email) ||
-    !isNonEmptyString(rollNumber) ||
-    !isNonEmptyString(branch) ||
-    !isNonEmptyString(year)
-  ) {
-    res.status(400).json({
-      message: "Name, email, roll number, branch and year are required",
-    });
-    return;
-  }
-
-  if (
-    (phone !== undefined && phone !== null && typeof phone !== "string") ||
-    (gender !== undefined && gender !== null && typeof gender !== "string") ||
-    (city !== undefined && city !== null && typeof city !== "string") ||
-    (state !== undefined && state !== null && typeof state !== "string") ||
-    (pincode !== undefined && pincode !== null && typeof pincode !== "string")
-  ) {
-    res.status(400).json({
-      message: "Optional text fields must be strings",
-    });
-    return;
-  }
-
-  let parsedDate: Date | undefined;
-
-  if (
-    dateOfBirth !== undefined &&
-    dateOfBirth !== null &&
-    dateOfBirth !== ""
-  ) {
-    if (typeof dateOfBirth !== "string") {
-      res.status(400).json({
-        message: "Date of birth must be a valid date string",
-      });
-      return;
-    }
-
-    parsedDate = new Date(dateOfBirth);
-
-    if (Number.isNaN(parsedDate.getTime())) {
-      res.status(400).json({
-        message: "Date of birth must be a valid date",
-      });
-      return;
-    }
-  }
-
+  next: NextFunction,
+): Promise<void> => {
   try {
-    const student = await prisma.student.create({
-      data: {
-        name: name.trim(),
-        email: email.trim(),
-        rollNumber: rollNumber.trim(),
-        branch: branch.trim(),
-        year: year.trim(),
-        ...(phone !== undefined && { phone }),
-        ...(gender !== undefined && { gender }),
-        ...(city !== undefined && { city }),
-        ...(state !== undefined && { state }),
-        ...(pincode !== undefined && { pincode }),
-        ...(parsedDate !== undefined && {
-          dateOfBirth: parsedDate,
-        }),
-      },
+    const {
+      name,
+      email,
+      password,
+      rollNumber,
+      branch,
+      year,
+      phone,
+      gender,
+      dateOfBirth,
+      city,
+      state,
+      pincode,
+    } = req.body;
+
+    if (
+      typeof name !== "string" ||
+      !name.trim() ||
+      typeof email !== "string" ||
+      !email.trim() ||
+      typeof password !== "string" ||
+      password.length < 8 ||
+      typeof rollNumber !== "string" ||
+      !rollNumber.trim() ||
+      typeof branch !== "string" ||
+      !branch.trim() ||
+      typeof year !== "string" ||
+      !year.trim()
+    ) {
+      res.status(400).json({
+        statusCode: 400,
+        message:
+          "Provide valid name, email, password (minimum 8 characters), roll number, branch and year",
+      });
+      return;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Enter a valid email address",
+      });
+      return;
+    }
+
+    let parsedDate: Date | null | undefined;
+
+    if (dateOfBirth === null || dateOfBirth === "") {
+      parsedDate = null;
+    } else if (dateOfBirth !== undefined) {
+      if (
+        typeof dateOfBirth !== "string" ||
+        Number.isNaN(Date.parse(dateOfBirth))
+      ) {
+        res.status(400).json({
+          statusCode: 400,
+          message: "Enter a valid date of birth",
+        });
+        return;
+      }
+
+      parsedDate = new Date(dateOfBirth);
+    }
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const student = await createStudent({
+      name: name.trim(),
+      email: normalizedEmail,
+      passwordHash,
+      rollNumber: rollNumber.trim(),
+      branch: branch.trim(),
+      year: year.trim(),
+      ...(phone !== undefined && { phone }),
+      ...(gender !== undefined && { gender }),
+      ...(parsedDate !== undefined && { dateOfBirth: parsedDate }),
+      ...(city !== undefined && { city }),
+      ...(state !== undefined && { state }),
+      ...(pincode !== undefined && { pincode }),
     });
 
-    res.status(201).json(student);
-  } catch (error) {
-    handleDatabaseError(error, res, next);
+    res.status(201).json({
+      statusCode: 201,
+      message: "Student created successfully",
+      data: student,
+    });
+  } catch (error: unknown) {
+    next(error);
   }
 };
 
@@ -221,31 +330,35 @@ export const addStudent = async (
 export const getStudentById = async (
   req: Request,
   res: Response,
-  next: NextFunction
-) => {
-  const id = Number(req.params.id);
-
-  if (!isValidId(id)) {
-    res.status(400).json({
-      message: "Invalid student ID",
-    });
-    return;
-  }
-
+  next: NextFunction,
+): Promise<void> => {
   try {
-    const student = await prisma.student.findUnique({
-      where: { id },
-    });
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Valid student ID is required",
+      });
+      return;
+    }
+
+    const student = await findStudentById(id);
 
     if (!student) {
       res.status(404).json({
+        statusCode: 404,
         message: "Student not found",
       });
       return;
     }
 
-    res.json(student);
-  } catch (error) {
+    res.status(200).json({
+      statusCode: 200,
+      message: "Student fetched successfully",
+      data: student,
+    });
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -254,169 +367,111 @@ export const getStudentById = async (
 export const updateStudent = async (
   req: Request,
   res: Response,
-  next: NextFunction
-) => {
-  const id = Number(req.params.id);
-
-  const {
-    name,
-    email,
-    phone,
-    rollNumber,
-    branch,
-    year,
-    gender,
-    dateOfBirth,
-    city,
-    state,
-    pincode,
-  } = req.body;
-
-  if (!isValidId(id)) {
-    res.status(400).json({
-      message: "Invalid student ID",
-    });
-    return;
-  }
-
-  const auth = res.locals.auth as AuthUser | undefined;
-
-  if (!auth) {
-    res.status(401).json({
-      message: "Authentication required",
-    });
-    return;
-  }
-
-  if (
-    auth.role === "STUDENT" &&
-    hasRestrictedStudentFields(req.body as Record<string, unknown>)
-  ) {
-    res.status(403).json({
-      message: "Students cannot update protected fields",
-    });
-    return;
-  }
-
-  // PUT requires all mandatory fields.
-  if (
-    !isNonEmptyString(name) ||
-    !isNonEmptyString(email) ||
-    !isNonEmptyString(rollNumber) ||
-    !isNonEmptyString(branch) ||
-    !isNonEmptyString(year)
-  ) {
-    res.status(400).json({
-      message: "Name, email, roll number, branch and year are required",
-    });
-    return;
-  }
-
-  if (
-    (phone !== undefined && phone !== null && typeof phone !== "string") ||
-    (gender !== undefined && gender !== null && typeof gender !== "string") ||
-    (city !== undefined && city !== null && typeof city !== "string") ||
-    (state !== undefined && state !== null && typeof state !== "string") ||
-    (pincode !== undefined && pincode !== null && typeof pincode !== "string")
-  ) {
-    res.status(400).json({
-      message: "Optional text fields must be strings",
-    });
-    return;
-  }
-
-  let parsedDate: Date | null | undefined;
-
-  if (dateOfBirth === null || dateOfBirth === "") {
-    parsedDate = null;
-  } else if (dateOfBirth !== undefined) {
-    if (typeof dateOfBirth !== "string") {
-      res.status(400).json({
-        message: "Date of birth must be a valid date string",
-      });
-      return;
-    }
-
-    parsedDate = new Date(dateOfBirth);
-
-    if (Number.isNaN(parsedDate.getTime())) {
-      res.status(400).json({
-        message: "Date of birth must be a valid date",
-      });
-      return;
-    }
-  }
-
+  next: NextFunction,
+): Promise<void> => {
   try {
-    const student = await prisma.student.update({
-      where: { id },
-      data: {
-        name: name.trim(),
-        email: email.trim(),
-        rollNumber: rollNumber.trim(),
-        branch: branch.trim(),
-        year: year.trim(),
-        ...(phone !== undefined && { phone }),
-        ...(gender !== undefined && { gender }),
-        ...(city !== undefined && { city }),
-        ...(state !== undefined && { state }),
-        ...(pincode !== undefined && { pincode }),
-        ...(parsedDate !== undefined && {
-          dateOfBirth: parsedDate,
-        }),
-      },
-    });
+    const id = Number(req.params.id);
 
-    res.json(student);
-  } catch (error) {
+    if (!Number.isInteger(id) || id <= 0) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Valid student ID is required",
+      });
+      return;
+    }
+
+    const {
+      name,
+      email,
+      rollNumber,
+      branch,
+      year,
+      phone,
+      gender,
+      dateOfBirth,
+      city,
+      state,
+      pincode,
+    } = req.body;
+
     if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2025"
+      typeof name !== "string" ||
+      !name.trim() ||
+      typeof email !== "string" ||
+      !email.trim() ||
+      typeof rollNumber !== "string" ||
+      !rollNumber.trim() ||
+      typeof branch !== "string" ||
+      !branch.trim() ||
+      typeof year !== "string" ||
+      !year.trim()
     ) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "PUT requires name, email, roll number, branch and year",
+      });
+      return;
+    }
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Enter a valid email address",
+      });
+      return;
+    }
+
+    let parsedDate: Date | null | undefined;
+
+    if (dateOfBirth === null || dateOfBirth === "") {
+      parsedDate = null;
+    } else if (dateOfBirth !== undefined) {
+      if (
+        typeof dateOfBirth !== "string" ||
+        Number.isNaN(Date.parse(dateOfBirth))
+      ) {
+        res.status(400).json({
+          statusCode: 400,
+          message: "Enter a valid date of birth",
+        });
+        return;
+      }
+
+      parsedDate = new Date(dateOfBirth);
+    }
+
+    const data: Prisma.UserUpdateInput = {
+      name: name.trim(),
+      email: normalizedEmail,
+      rollNumber: rollNumber.trim(),
+      branch: branch.trim(),
+      year: year.trim(),
+      ...(phone !== undefined && { phone }),
+      ...(gender !== undefined && { gender }),
+      ...(parsedDate !== undefined && { dateOfBirth: parsedDate }),
+      ...(city !== undefined && { city }),
+      ...(state !== undefined && { state }),
+      ...(pincode !== undefined && { pincode }),
+    };
+
+    const student = await updateStudentModel(id, data);
+
+    if (!student) {
       res.status(404).json({
+        statusCode: 404,
         message: "Student not found",
       });
       return;
     }
 
-    handleDatabaseError(error, res, next);
-  }
-};
-
-// DELETE /students/:id
-export const deleteStudentById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  const id = Number(req.params.id);
-
-  if (!isValidId(id)) {
-    res.status(400).json({
-      message: "Invalid student ID",
+    res.status(200).json({
+      statusCode: 200,
+      message: "Student updated successfully",
+      data: student,
     });
-    return;
-  }
-
-  try {
-    await prisma.student.delete({
-      where: { id },
-    });
-
-    res.json({
-      message: "Student deleted successfully",
-    });
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2025"
-    ) {
-      res.status(404).json({
-        message: "Student not found",
-      });
-      return;
-    }
-
+  } catch (error: unknown) {
     next(error);
   }
 };
@@ -425,186 +480,192 @@ export const deleteStudentById = async (
 export const patchStudent = async (
   req: Request,
   res: Response,
-  next: NextFunction
-) => {
-  const id = Number(req.params.id);
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const id = Number(req.params.id);
 
-  const {
-    name,
-    email,
-    phone,
-    rollNumber,
-    branch,
-    year,
-    gender,
-    dateOfBirth,
-    city,
-    state,
-    pincode,
-  } = req.body;
-
-  if (!isValidId(id)) {
-    res.status(400).json({
-      message: "Invalid student ID",
-    });
-    return;
-  }
-
-  const auth = res.locals.auth as AuthUser | undefined;
-
-  if (!auth) {
-    res.status(401).json({
-      message: "Authentication required",
-    });
-    return;
-  }
-
-  if (
-    auth.role === "STUDENT" &&
-    hasRestrictedStudentFields(req.body as Record<string, unknown>)
-  ) {
-    res.status(403).json({
-      message: "Students cannot update protected fields",
-    });
-    return;
-  }
-
-  const data: Prisma.StudentUpdateInput = {};
-
-  const textFields = {
-    name,
-    email,
-    phone,
-    rollNumber,
-    branch,
-    year,
-    gender,
-    city,
-    state,
-    pincode,
-  };
-
-  for (const [field, value] of Object.entries(textFields)) {
-    if (value === undefined) continue;
-
-    if (value !== null && typeof value !== "string") {
+    if (!Number.isInteger(id) || id <= 0) {
       res.status(400).json({
-        message: `${field} must be a string`,
+        statusCode: 400,
+        message: "Valid student ID is required",
       });
       return;
     }
+
+    const body = req.body as Record<string, unknown>;
+
+    const allowedFields = [
+      "name",
+      "email",
+      "rollNumber",
+      "branch",
+      "year",
+      "phone",
+      "gender",
+      "dateOfBirth",
+      "city",
+      "state",
+      "pincode",
+    ];
+
+    const keys = Object.keys(body);
 
     if (
-      ["name", "email", "rollNumber", "branch", "year"].includes(field) &&
-      (typeof value !== "string" || value.trim().length === 0)
+      keys.length === 0 ||
+      keys.some((key) => !allowedFields.includes(key))
     ) {
       res.status(400).json({
-        message: `${field} cannot be empty`,
+        statusCode: 400,
+        message:
+          keys.length === 0
+            ? "Provide at least one field to update"
+            : "One or more fields cannot be updated",
       });
       return;
     }
 
-    if (
-      value === null &&
-      ["name", "email", "rollNumber", "branch", "year"].includes(field)
-    ) {
-      res.status(400).json({
-        message: `${field} cannot be null`,
-      });
-      return;
-    }
+    const data: Prisma.UserUpdateInput = {};
 
-    if (value === null || value === undefined) continue;
+    for (const key of keys) {
+      const value = body[key];
 
-    switch (field) {
-      case "name":
-        data.name = value.trim();
-        break;
-      case "email":
-        data.email = value.trim();
-        break;
-      case "phone":
-        data.phone = value;
-        break;
-      case "rollNumber":
-        data.rollNumber = value.trim();
-        break;
-      case "branch":
-        data.branch = value.trim();
-        break;
-      case "year":
-        data.year = value.trim();
-        break;
-      case "gender":
-        data.gender = value;
-        break;
-      case "city":
-        data.city = value;
-        break;
-      case "state":
-        data.state = value;
-        break;
-      case "pincode":
-        data.pincode = value;
-        break;
-    }
-  }
+      if (key === "dateOfBirth") {
+        if (value === null || value === "") {
+          data.dateOfBirth = null;
+        } else if (
+          typeof value === "string" &&
+          !Number.isNaN(Date.parse(value))
+        ) {
+          data.dateOfBirth = new Date(value);
+        } else {
+          res.status(400).json({
+            statusCode: 400,
+            message: "Enter a valid date of birth",
+          });
+          return;
+        }
 
-  if (dateOfBirth !== undefined) {
-    if (dateOfBirth === null || dateOfBirth === "") {
-      data.dateOfBirth = null;
-    } else if (typeof dateOfBirth === "string") {
-      const parsedDate = new Date(dateOfBirth);
+        continue;
+      }
 
-      if (Number.isNaN(parsedDate.getTime())) {
+      if (
+        ["name", "email", "rollNumber", "branch", "year"].includes(key) &&
+        (typeof value !== "string" || !value.trim())
+      ) {
         res.status(400).json({
-          message: "Date of birth must be a valid date",
+          statusCode: 400,
+          message: `${key} must be a non-empty string`,
         });
         return;
       }
 
-      data.dateOfBirth = parsedDate;
-    } else {
-      res.status(400).json({
-        message: "Date of birth must be a valid date string",
-      });
-      return;
+      if (
+        ["phone", "gender", "city", "state", "pincode"].includes(key) &&
+        value !== null &&
+        value !== undefined &&
+        typeof value !== "string"
+      ) {
+        res.status(400).json({
+          statusCode: 400,
+          message: `${key} must be a string or null`,
+        });
+        return;
+      }
+
+      if (typeof value === "string") {
+        const cleanValue = value.trim();
+
+        if (key === "email") {
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanValue)) {
+            res.status(400).json({
+              statusCode: 400,
+              message: "Enter a valid email address",
+            });
+            return;
+          }
+
+          data.email = cleanValue.toLowerCase();
+        } else {
+          (data as Record<string, unknown>)[key] = cleanValue;
+        }
+      } else if (value === null) {
+        (data as Record<string, unknown>)[key] = null;
+      }
     }
-  }
 
-  if (Object.keys(data).length === 0) {
-    res.status(400).json({
-      message: "Provide at least one field to update",
-    });
-    return;
-  }
+    const student = await updateStudentModel(id, data);
 
-  try {
-    const student = await prisma.student.update({
-      where: { id },
-      data,
-    });
-
-    res.json(student);
-  } catch (error) {
-    if (
-      error instanceof Prisma.PrismaClientKnownRequestError &&
-      error.code === "P2025"
-    ) {
+    if (!student) {
       res.status(404).json({
+        statusCode: 404,
         message: "Student not found",
       });
       return;
     }
 
-    handleDatabaseError(error, res, next);
+    res.status(200).json({
+      statusCode: 200,
+      message: "Student updated successfully",
+      data: student,
+    });
+  } catch (error: unknown) {
+    next(error);
   }
 };
 
-export const testError = (
+// DELETE /students/:id
+export const deleteStudentById = async (
   req: Request,
   res: Response,
-  next: NextFunction
-) => {
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const id = Number(req.params.id);
+
+    if (!Number.isInteger(id) || id <= 0) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Valid student ID is required",
+      });
+      return;
+    }
+
+    const student = await findStudentById(id);
+
+    if (!student) {
+      res.status(404).json({
+        statusCode: 404,
+        message: "Student not found",
+      });
+      return;
+    }
+
+    const deletedStudent = await deleteStudentModel(id);
+
+    if (!deletedStudent) {
+      res.status(404).json({
+        statusCode: 404,
+        message: "Student not found",
+      });
+      return;
+    }
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Student deleted successfully",
+      data: deletedStudent,
+    });
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+// GET /test-error
+export const testError = (
+  _req: Request,
+  _res: Response,
+  next: NextFunction,
+): void => {
   next(new Error("Test error"));
 };

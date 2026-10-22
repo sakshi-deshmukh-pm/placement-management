@@ -67,6 +67,7 @@ export const patchPlacementDrive = async (
         eligibilityCriteria?: string;
         deadline?: Date;
         companyId?: number;
+        status?:"OPEN"|"CLOSED"
     }
 ) => {
     return await prisma.placementDrive.update({
@@ -80,4 +81,10 @@ export const deletePlacementDrive = async (id: number) => {
     return await prisma.placementDrive.delete({
         where: { id }
     });
+};
+
+export const countDriveApplications = async (placementDriveId: number) => {
+  return prisma.application.count({
+    where: { placementDriveId },
+  });
 };

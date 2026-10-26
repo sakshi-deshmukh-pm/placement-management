@@ -12,8 +12,17 @@
 export const Role = {
   ADMIN: 'ADMIN',
   STUDENT: 'STUDENT',
-  PLACEMENT_COORDINATOR: 'PLACEMENT_COORDINATOR',
-  RECRUITER: 'RECRUITER'
+  PLACEMENT_COORDINATOR: 'PLACEMENT_COORDINATOR'
 } as const
 
 export type Role = (typeof Role)[keyof typeof Role]
+
+
+export const ApplicationStatus = {
+  APPLIED: 'APPLIED',
+  SHORTLISTED: 'SHORTLISTED',
+  SELECTED: 'SELECTED',
+  REJECTED: 'REJECTED'
+} as const
+
+export type ApplicationStatus = (typeof ApplicationStatus)[keyof typeof ApplicationStatus]

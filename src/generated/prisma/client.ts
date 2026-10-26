@@ -61,3 +61,8 @@ export type PlacementDrive = Prisma.PlacementDriveModel
  * 
  */
 export type Application = Prisma.ApplicationModel
+/**
+ * Model Interview
+ * 
+ */
+export type Interview = Prisma.InterviewModel

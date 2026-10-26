@@ -42,7 +42,7 @@ export type ApplicationMinAggregateOutputType = {
   id: number | null
   userId: number | null
   placementDriveId: number | null
-  status: string | null
+  status: $Enums.ApplicationStatus | null
   appliedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -52,7 +52,7 @@ export type ApplicationMaxAggregateOutputType = {
   id: number | null
   userId: number | null
   placementDriveId: number | null
-  status: string | null
+  status: $Enums.ApplicationStatus | null
   appliedAt: Date | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -203,7 +203,7 @@ export type ApplicationGroupByOutputType = {
   id: number
   userId: number
   placementDriveId: number
-  status: string
+  status: $Enums.ApplicationStatus
   appliedAt: Date
   createdAt: Date
   updatedAt: Date
@@ -236,12 +236,13 @@ export type ApplicationWhereInput = {
   id?: Prisma.IntFilter<"Application"> | number
   userId?: Prisma.IntFilter<"Application"> | number
   placementDriveId?: Prisma.IntFilter<"Application"> | number
-  status?: Prisma.StringFilter<"Application"> | string
+  status?: Prisma.EnumApplicationStatusFilter<"Application"> | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   placementDrive?: Prisma.XOR<Prisma.PlacementDriveScalarRelationFilter, Prisma.PlacementDriveWhereInput>
+  interviews?: Prisma.InterviewListRelationFilter
 }
 
 export type ApplicationOrderByWithRelationInput = {
@@ -254,6 +255,7 @@ export type ApplicationOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
   placementDrive?: Prisma.PlacementDriveOrderByWithRelationInput
+  interviews?: Prisma.InterviewOrderByRelationAggregateInput
 }
 
 export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
@@ -264,12 +266,13 @@ export type ApplicationWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.ApplicationWhereInput | Prisma.ApplicationWhereInput[]
   userId?: Prisma.IntFilter<"Application"> | number
   placementDriveId?: Prisma.IntFilter<"Application"> | number
-  status?: Prisma.StringFilter<"Application"> | string
+  status?: Prisma.EnumApplicationStatusFilter<"Application"> | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   placementDrive?: Prisma.XOR<Prisma.PlacementDriveScalarRelationFilter, Prisma.PlacementDriveWhereInput>
+  interviews?: Prisma.InterviewListRelationFilter
 }, "id" | "userId_placementDriveId">
 
 export type ApplicationOrderByWithAggregationInput = {
@@ -294,62 +297,66 @@ export type ApplicationScalarWhereWithAggregatesInput = {
   id?: Prisma.IntWithAggregatesFilter<"Application"> | number
   userId?: Prisma.IntWithAggregatesFilter<"Application"> | number
   placementDriveId?: Prisma.IntWithAggregatesFilter<"Application"> | number
-  status?: Prisma.StringWithAggregatesFilter<"Application"> | string
+  status?: Prisma.EnumApplicationStatusWithAggregatesFilter<"Application"> | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeWithAggregatesFilter<"Application"> | Date | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Application"> | Date | string
 }
 
 export type ApplicationCreateInput = {
-  status?: string
+  status?: $Enums.ApplicationStatus
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutApplicationsInput
   placementDrive: Prisma.PlacementDriveCreateNestedOneWithoutApplicationsInput
+  interviews?: Prisma.InterviewCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateInput = {
   id?: number
   userId: number
   placementDriveId: number
-  status?: string
+  status?: $Enums.ApplicationStatus
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUpdateInput = {
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutApplicationsNestedInput
   placementDrive?: Prisma.PlacementDriveUpdateOneRequiredWithoutApplicationsNestedInput
+  interviews?: Prisma.InterviewUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
   placementDriveId?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  interviews?: Prisma.InterviewUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationCreateManyInput = {
   id?: number
   userId: number
   placementDriveId: number
-  status?: string
+  status?: $Enums.ApplicationStatus
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ApplicationUpdateManyMutationInput = {
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -359,7 +366,7 @@ export type ApplicationUncheckedUpdateManyInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
   placementDriveId?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -420,6 +427,11 @@ export type ApplicationSumOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   placementDriveId?: Prisma.SortOrder
+}
+
+export type ApplicationScalarRelationFilter = {
+  is?: Prisma.ApplicationWhereInput
+  isNot?: Prisma.ApplicationWhereInput
 }
 
 export type ApplicationCreateNestedManyWithoutUserInput = {
@@ -506,21 +518,41 @@ export type ApplicationUncheckedUpdateManyWithoutPlacementDriveNestedInput = {
   deleteMany?: Prisma.ApplicationScalarWhereInput | Prisma.ApplicationScalarWhereInput[]
 }
 
+export type EnumApplicationStatusFieldUpdateOperationsInput = {
+  set?: $Enums.ApplicationStatus
+}
+
+export type ApplicationCreateNestedOneWithoutInterviewsInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutInterviewsInput, Prisma.ApplicationUncheckedCreateWithoutInterviewsInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutInterviewsInput
+  connect?: Prisma.ApplicationWhereUniqueInput
+}
+
+export type ApplicationUpdateOneRequiredWithoutInterviewsNestedInput = {
+  create?: Prisma.XOR<Prisma.ApplicationCreateWithoutInterviewsInput, Prisma.ApplicationUncheckedCreateWithoutInterviewsInput>
+  connectOrCreate?: Prisma.ApplicationCreateOrConnectWithoutInterviewsInput
+  upsert?: Prisma.ApplicationUpsertWithoutInterviewsInput
+  connect?: Prisma.ApplicationWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ApplicationUpdateToOneWithWhereWithoutInterviewsInput, Prisma.ApplicationUpdateWithoutInterviewsInput>, Prisma.ApplicationUncheckedUpdateWithoutInterviewsInput>
+}
+
 export type ApplicationCreateWithoutUserInput = {
-  status?: string
+  status?: $Enums.ApplicationStatus
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   placementDrive: Prisma.PlacementDriveCreateNestedOneWithoutApplicationsInput
+  interviews?: Prisma.InterviewCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutUserInput = {
   id?: number
   placementDriveId: number
-  status?: string
+  status?: $Enums.ApplicationStatus
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutUserInput = {
@@ -556,27 +588,29 @@ export type ApplicationScalarWhereInput = {
   id?: Prisma.IntFilter<"Application"> | number
   userId?: Prisma.IntFilter<"Application"> | number
   placementDriveId?: Prisma.IntFilter<"Application"> | number
-  status?: Prisma.StringFilter<"Application"> | string
+  status?: Prisma.EnumApplicationStatusFilter<"Application"> | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   createdAt?: Prisma.DateTimeFilter<"Application"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Application"> | Date | string
 }
 
 export type ApplicationCreateWithoutPlacementDriveInput = {
-  status?: string
+  status?: $Enums.ApplicationStatus
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutApplicationsInput
+  interviews?: Prisma.InterviewCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationUncheckedCreateWithoutPlacementDriveInput = {
   id?: number
   userId: number
-  status?: string
+  status?: $Enums.ApplicationStatus
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
+  interviews?: Prisma.InterviewUncheckedCreateNestedManyWithoutApplicationInput
 }
 
 export type ApplicationCreateOrConnectWithoutPlacementDriveInput = {
@@ -605,36 +639,92 @@ export type ApplicationUpdateManyWithWhereWithoutPlacementDriveInput = {
   data: Prisma.XOR<Prisma.ApplicationUpdateManyMutationInput, Prisma.ApplicationUncheckedUpdateManyWithoutPlacementDriveInput>
 }
 
+export type ApplicationCreateWithoutInterviewsInput = {
+  status?: $Enums.ApplicationStatus
+  appliedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  user: Prisma.UserCreateNestedOneWithoutApplicationsInput
+  placementDrive: Prisma.PlacementDriveCreateNestedOneWithoutApplicationsInput
+}
+
+export type ApplicationUncheckedCreateWithoutInterviewsInput = {
+  id?: number
+  userId: number
+  placementDriveId: number
+  status?: $Enums.ApplicationStatus
+  appliedAt?: Date | string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type ApplicationCreateOrConnectWithoutInterviewsInput = {
+  where: Prisma.ApplicationWhereUniqueInput
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutInterviewsInput, Prisma.ApplicationUncheckedCreateWithoutInterviewsInput>
+}
+
+export type ApplicationUpsertWithoutInterviewsInput = {
+  update: Prisma.XOR<Prisma.ApplicationUpdateWithoutInterviewsInput, Prisma.ApplicationUncheckedUpdateWithoutInterviewsInput>
+  create: Prisma.XOR<Prisma.ApplicationCreateWithoutInterviewsInput, Prisma.ApplicationUncheckedCreateWithoutInterviewsInput>
+  where?: Prisma.ApplicationWhereInput
+}
+
+export type ApplicationUpdateToOneWithWhereWithoutInterviewsInput = {
+  where?: Prisma.ApplicationWhereInput
+  data: Prisma.XOR<Prisma.ApplicationUpdateWithoutInterviewsInput, Prisma.ApplicationUncheckedUpdateWithoutInterviewsInput>
+}
+
+export type ApplicationUpdateWithoutInterviewsInput = {
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
+  appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  user?: Prisma.UserUpdateOneRequiredWithoutApplicationsNestedInput
+  placementDrive?: Prisma.PlacementDriveUpdateOneRequiredWithoutApplicationsNestedInput
+}
+
+export type ApplicationUncheckedUpdateWithoutInterviewsInput = {
+  id?: Prisma.IntFieldUpdateOperationsInput | number
+  userId?: Prisma.IntFieldUpdateOperationsInput | number
+  placementDriveId?: Prisma.IntFieldUpdateOperationsInput | number
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
+  appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
 export type ApplicationCreateManyUserInput = {
   id?: number
   placementDriveId: number
-  status?: string
+  status?: $Enums.ApplicationStatus
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ApplicationUpdateWithoutUserInput = {
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   placementDrive?: Prisma.PlacementDriveUpdateOneRequiredWithoutApplicationsNestedInput
+  interviews?: Prisma.InterviewUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   placementDriveId?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  interviews?: Prisma.InterviewUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   placementDriveId?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -643,38 +733,69 @@ export type ApplicationUncheckedUpdateManyWithoutUserInput = {
 export type ApplicationCreateManyPlacementDriveInput = {
   id?: number
   userId: number
-  status?: string
+  status?: $Enums.ApplicationStatus
   appliedAt?: Date | string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
 
 export type ApplicationUpdateWithoutPlacementDriveInput = {
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutApplicationsNestedInput
+  interviews?: Prisma.InterviewUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateWithoutPlacementDriveInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  interviews?: Prisma.InterviewUncheckedUpdateManyWithoutApplicationNestedInput
 }
 
 export type ApplicationUncheckedUpdateManyWithoutPlacementDriveInput = {
   id?: Prisma.IntFieldUpdateOperationsInput | number
   userId?: Prisma.IntFieldUpdateOperationsInput | number
-  status?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.EnumApplicationStatusFieldUpdateOperationsInput | $Enums.ApplicationStatus
   appliedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
+
+/**
+ * Count Type ApplicationCountOutputType
+ */
+
+export type ApplicationCountOutputType = {
+  interviews: number
+}
+
+export type ApplicationCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  interviews?: boolean | ApplicationCountOutputTypeCountInterviewsArgs
+}
+
+/**
+ * ApplicationCountOutputType without action
+ */
+export type ApplicationCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ApplicationCountOutputType
+   */
+  select?: Prisma.ApplicationCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ApplicationCountOutputType without action
+ */
+export type ApplicationCountOutputTypeCountInterviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.InterviewWhereInput
+}
 
 
 export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -687,6 +808,8 @@ export type ApplicationSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   updatedAt?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
+  interviews?: boolean | Prisma.Application$interviewsArgs<ExtArgs>
+  _count?: boolean | Prisma.ApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["application"]>
 
 export type ApplicationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -727,6 +850,8 @@ export type ApplicationOmit<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type ApplicationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   placementDrive?: boolean | Prisma.PlacementDriveDefaultArgs<ExtArgs>
+  interviews?: boolean | Prisma.Application$interviewsArgs<ExtArgs>
+  _count?: boolean | Prisma.ApplicationCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ApplicationIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -742,12 +867,13 @@ export type $ApplicationPayload<ExtArgs extends runtime.Types.Extensions.Interna
   objects: {
     user: Prisma.$UserPayload<ExtArgs>
     placementDrive: Prisma.$PlacementDrivePayload<ExtArgs>
+    interviews: Prisma.$InterviewPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: number
     userId: number
     placementDriveId: number
-    status: string
+    status: $Enums.ApplicationStatus
     appliedAt: Date
     createdAt: Date
     updatedAt: Date
@@ -1147,6 +1273,7 @@ export interface Prisma__ApplicationClient<T, Null = never, ExtArgs extends runt
   readonly [Symbol.toStringTag]: "PrismaPromise"
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   placementDrive<T extends Prisma.PlacementDriveDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.PlacementDriveDefaultArgs<ExtArgs>>): Prisma.Prisma__PlacementDriveClient<runtime.Types.Result.GetResult<Prisma.$PlacementDrivePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  interviews<T extends Prisma.Application$interviewsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Application$interviewsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$InterviewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1179,7 +1306,7 @@ export interface ApplicationFieldRefs {
   readonly id: Prisma.FieldRef<"Application", 'Int'>
   readonly userId: Prisma.FieldRef<"Application", 'Int'>
   readonly placementDriveId: Prisma.FieldRef<"Application", 'Int'>
-  readonly status: Prisma.FieldRef<"Application", 'String'>
+  readonly status: Prisma.FieldRef<"Application", 'ApplicationStatus'>
   readonly appliedAt: Prisma.FieldRef<"Application", 'DateTime'>
   readonly createdAt: Prisma.FieldRef<"Application", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Application", 'DateTime'>
@@ -1581,6 +1708,30 @@ export type ApplicationDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many Applications to delete.
    */
   limit?: number
+}
+
+/**
+ * Application.interviews
+ */
+export type Application$interviewsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Interview
+   */
+  select?: Prisma.InterviewSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Interview
+   */
+  omit?: Prisma.InterviewOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.InterviewInclude<ExtArgs> | null
+  where?: Prisma.InterviewWhereInput
+  orderBy?: Prisma.InterviewOrderByWithRelationInput | Prisma.InterviewOrderByWithRelationInput[]
+  cursor?: Prisma.InterviewWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.InterviewScalarFieldEnum | Prisma.InterviewScalarFieldEnum[]
 }
 
 /**

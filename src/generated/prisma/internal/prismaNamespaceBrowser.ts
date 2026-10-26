@@ -54,7 +54,8 @@ export const ModelName = {
   User: 'User',
   Company: 'Company',
   PlacementDrive: 'PlacementDrive',
-  Application: 'Application'
+  Application: 'Application',
+  Interview: 'Interview'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -135,6 +136,22 @@ export const ApplicationScalarFieldEnum = {
 } as const
 
 export type ApplicationScalarFieldEnum = (typeof ApplicationScalarFieldEnum)[keyof typeof ApplicationScalarFieldEnum]
+
+
+export const InterviewScalarFieldEnum = {
+  id: 'id',
+  applicationId: 'applicationId',
+  round: 'round',
+  scheduledAt: 'scheduledAt',
+  mode: 'mode',
+  meetingLink: 'meetingLink',
+  status: 'status',
+  feedback: 'feedback',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type InterviewScalarFieldEnum = (typeof InterviewScalarFieldEnum)[keyof typeof InterviewScalarFieldEnum]
 
 
 export const SortOrder = {

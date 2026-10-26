@@ -1,4 +1,3 @@
-
 import {
   Box,
   Drawer,
@@ -15,7 +14,8 @@ import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import PeopleOutlineRoundedIcon from "@mui/icons-material/PeopleOutlineRounded";
 import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded";
 import SchoolRoundedIcon from "@mui/icons-material/SchoolRounded";
-import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded"
+import BusinessOutlinedIcon from "@mui/icons-material/BusinessOutlined";
 
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -32,13 +32,30 @@ type SideNavProps = {
   onClose?: () => void;
 };
 
+function getSavedRole(): string {
+  try {
+    const savedUser = localStorage.getItem("user");
+
+    if (savedUser) {
+      const user = JSON.parse(savedUser) as { role?: string };
+      if (user.role) return user.role.toUpperCase();
+    }
+  } catch {
+    // Fall back to the separately saved role.
+  }
+
+  return (localStorage.getItem("role") || "STUDENT").toUpperCase();
+}
+
 function SideNav({
   mobileOpen = false,
   onClose,
 }: SideNavProps) {
   const location = useLocation();
+  const role = getSavedRole();
 
-  const isAdmin = location.pathname.startsWith("/admin");
+  const isAdmin = role === "ADMIN";
+  const isCoordinator = role === "PLACEMENT_COORDINATOR";
 
   const menuItems: MenuItem[] = isAdmin
     ? [
@@ -68,33 +85,90 @@ function SideNav({
           icon: <EventAvailableRoundedIcon />,
         },
       ]
-    : [
-        {
-          label: "Dashboard",
-          path: "/dashboard",
-          icon: <DashboardRoundedIcon />,
-        },
-        {
-          label: "Placement Drives",
-          path: "/drives",
-          icon: <WorkOutlineRoundedIcon />,
-        },
-        {
-          label: "My Applications",
-          path: "/applications",
-          icon: <AssignmentOutlinedIcon />,
-        },
-        {
-          label: "Interviews",
-          path: "/interviews",
-          icon: <EventAvailableRoundedIcon />,
-        },
-        {
-          label: "My Profile",
-          path: "/profile",
-          icon: <PeopleOutlineRoundedIcon />,
-        },
-      ];
+    : isCoordinator
+      ? [
+          {
+            label: "Dashboard",
+            path: "/coordinator-dashboard",
+            icon: <DashboardRoundedIcon />,
+          },
+          {
+            label: "Manage Students",
+            path: "/coordinator/students",
+            icon: <PeopleOutlineRoundedIcon />,
+          },
+          {
+            label: "Placement Drives",
+            path: "/coordinator/drives",
+            icon: <WorkOutlineRoundedIcon />,
+          },
+          {
+            label: "Applications",
+            path: "/coordinator/applications",
+            icon: <AssignmentOutlinedIcon />,
+          },
+          {
+            label: "Interviews",
+            path: "/coordinator/interviews",
+            icon: <EventAvailableRoundedIcon />,
+          },
+          {
+  label: "Add Company",
+  path: "/coordinator/companies",
+  icon: <BusinessOutlinedIcon />,
+},
+        ]
+      : [
+          {
+            label: "Dashboard",
+            path: "/dashboard",
+            icon: <DashboardRoundedIcon />,
+          },
+          {
+            label: "Placement Drives",
+            path: "/drives",
+            icon: <WorkOutlineRoundedIcon />,
+          },
+          {
+            label: "My Applications",
+            path: "/applications",
+            icon: <AssignmentOutlinedIcon />,
+          },
+          {
+            label: "Interviews",
+            path: "/interviews",
+            icon: <EventAvailableRoundedIcon />,
+          },
+          {
+            label: "My Profile",
+            path: "/profile",
+            icon: <PeopleOutlineRoundedIcon />,
+          },
+        ];
+
+  const portalTitle = isAdmin
+    ? "ADMINISTRATION"
+    : isCoordinator
+      ? "COORDINATOR PORTAL"
+      : "STUDENT PORTAL";
+
+  const portalDescription = isAdmin
+    ? "Manage placement activities and records."
+    : isCoordinator
+      ? "Coordinate students and placement activities."
+      : "Your journey towards the next opportunity.";
+
+  const cardTitle = isAdmin
+    ? "Everything in one place"
+    : isCoordinator
+      ? "Placement coordination"
+      : "Your next opportunity awaits!";
+
+  const cardDescription = isAdmin
+    ? "Keep student records and placement activities organized."
+    : isCoordinator
+      ? "Keep student records, drives, applications, and interviews organized."
+      : "Keep your profile updated and stay ready for placement drives.";
 
   const drawerContent = (
     <Box
@@ -108,8 +182,6 @@ function SideNav({
         boxSizing: "border-box",
       }}
     >
-
-      {/* Menu heading */}
       <Typography
         sx={{
           fontSize: 10,
@@ -120,7 +192,7 @@ function SideNav({
           px: 1.5,
         }}
       >
-        {isAdmin ? "ADMINISTRATION" : "STUDENT PORTAL"}
+        {portalTitle}
       </Typography>
 
       <Typography
@@ -132,12 +204,9 @@ function SideNav({
           lineHeight: 1.6,
         }}
       >
-        {isAdmin
-          ? "Manage placement activities and records."
-          : "Your journey towards the next opportunity."}
+        {portalDescription}
       </Typography>
 
-      {/* Navigation items */}
       <List disablePadding>
         {menuItems.map((item) => (
           <ListItemButton
@@ -214,7 +283,6 @@ function SideNav({
         ))}
       </List>
 
-      {/* Bottom information card */}
       <Box sx={{ mt: "auto", pt: 3 }}>
         <Box
           sx={{
@@ -250,9 +318,7 @@ function SideNav({
               mb: 0.8,
             }}
           >
-            {isAdmin
-              ? "Everything in one place"
-              : "Your next opportunity awaits!"}
+            {cardTitle}
           </Typography>
 
           <Typography
@@ -262,12 +328,10 @@ function SideNav({
               lineHeight: 1.7,
             }}
           >
-            {isAdmin
-              ? "Keep student records and placement activities organized."
-              : "Keep your profile updated and stay ready for placement drives."}
+            {cardDescription}
           </Typography>
 
-          {!isAdmin && (
+          {!isAdmin && !isCoordinator && (
             <Box
               component={NavLink}
               to="/profile"
@@ -308,7 +372,6 @@ function SideNav({
 
   return (
     <>
-      {/* Desktop sidebar */}
       <Drawer
         variant="permanent"
         sx={{
@@ -329,7 +392,6 @@ function SideNav({
         {drawerContent}
       </Drawer>
 
-      {/* Mobile sidebar */}
       <Drawer
         variant="temporary"
         open={mobileOpen}

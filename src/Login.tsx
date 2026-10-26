@@ -113,8 +113,8 @@ export default function Login() {
             if (!response.ok) {
                 throw new Error(
                     result.message ||
-                        result.error ||
-                        "Login failed. Please try again.",
+                    result.error ||
+                    "Login failed. Please try again.",
                 );
             }
 
@@ -142,12 +142,14 @@ export default function Login() {
                     user,
                 }),
             );
-
             if (user.role === "ADMIN") {
                 navigate("/admin-dashboard", { replace: true });
+            } else if (user.role === "PLACEMENT_COORDINATOR") {
+                navigate("/coordinator-dashboard", { replace: true });
             } else {
                 navigate("/dashboard", { replace: true });
             }
+
         } catch (err: unknown) {
             if (err instanceof Error) {
                 setError(

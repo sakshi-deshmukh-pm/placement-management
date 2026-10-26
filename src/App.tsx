@@ -12,6 +12,7 @@ import Login from "./Login";
 import Register from "./Register";
 import Profile from "./Profile";
 
+import CoordinatorDashboard from "./pages/CoordinatorDashboard";
 import DashboardLayout from "./components/DashboardLayout";
 import DashboardHome from "./pages/DashboardHome";
 import PlacementDrives from "./pages/PlacementDrives";
@@ -21,6 +22,7 @@ import ManageStudents from "./pages/ManageStudents";
 import ManageApplications from "./pages/ManageApplications";
 import ManagePlacementDrives from "./pages/ManagePlacementDrives";
 import ManageInterviews from "./pages/ManageInterviews";
+import AddCompany from "./pages/AddCompany";
 
 import {
   Box,
@@ -97,6 +99,10 @@ function RequireRole({
 
     if (role === "STUDENT") {
       return <Navigate to="/dashboard" replace />;
+    }
+
+    if (role === "PLACEMENT_COORDINATOR") {
+      return <Navigate to="/coordinator-dashboard" replace />;
     }
 
     return <Navigate to="/login" replace />;
@@ -410,12 +416,91 @@ function App() {
             <RequireAuth>
               <RequireRole allowedRole="ADMIN">
                 <DashboardLayout>
-                 <ManageInterviews/>
+                  <ManageInterviews />
                 </DashboardLayout>
               </RequireRole>
             </RequireAuth>
           }
         />
+
+        <Route
+          path="/coordinator-dashboard"
+          element={
+            <RequireAuth>
+              <RequireRole allowedRole="PLACEMENT_COORDINATOR">
+                <DashboardLayout>
+                  <CoordinatorDashboard />
+                </DashboardLayout>
+              </RequireRole>
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/coordinator/students"
+          element={
+            <RequireAuth>
+              <RequireRole allowedRole="PLACEMENT_COORDINATOR">
+                <DashboardLayout>
+                  <ManageStudents />
+                </DashboardLayout>
+              </RequireRole>
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/coordinator/drives"
+          element={
+            <RequireAuth>
+              <RequireRole allowedRole="PLACEMENT_COORDINATOR">
+                <DashboardLayout>
+                  <ManagePlacementDrives />
+                </DashboardLayout>
+              </RequireRole>
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/coordinator/applications"
+          element={
+            <RequireAuth>
+              <RequireRole allowedRole="PLACEMENT_COORDINATOR">
+                <DashboardLayout>
+                  <ManageApplications />
+                </DashboardLayout>
+              </RequireRole>
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/coordinator/interviews"
+          element={
+            <RequireAuth>
+              <RequireRole allowedRole="PLACEMENT_COORDINATOR">
+                <DashboardLayout>
+                  <ManageInterviews />
+                </DashboardLayout>
+              </RequireRole>
+            </RequireAuth>
+          }
+        />
+
+        <Route
+          path="/coordinator/companies"
+          element={
+            <RequireAuth>
+              <RequireRole allowedRole="PLACEMENT_COORDINATOR">
+                <DashboardLayout>
+                  <AddCompany />
+                </DashboardLayout>
+              </RequireRole>
+            </RequireAuth>
+          }
+        />
+
 
         {/* Default route */}
         <Route
@@ -423,6 +508,8 @@ function App() {
           element={
             getUserRole() === "ADMIN" ? (
               <Navigate to="/admin-dashboard" replace />
+            ) : getUserRole() === "PLACEMENT_COORDINATOR" ? (
+              <Navigate to="/coordinator-dashboard" replace />
             ) : localStorage.getItem("token") ? (
               <Navigate to="/dashboard" replace />
             ) : (
@@ -435,20 +522,19 @@ function App() {
         <Route
           path="*"
           element={
-            localStorage.getItem("token") ? (
-              <Navigate
-                to={
-                  getUserRole() === "ADMIN"
-                    ? "/admin-dashboard"
-                    : "/dashboard"
-                }
-                replace
-              />
+            getUserRole() === "ADMIN" ? (
+              <Navigate to="/admin-dashboard" replace />
+            ) : getUserRole() === "PLACEMENT_COORDINATOR" ? (
+              <Navigate to="/coordinator-dashboard" replace />
+            ) : localStorage.getItem("token") ? (
+              <Navigate to="/dashboard" replace />
             ) : (
               <Navigate to="/login" replace />
             )
           }
         />
+
+
       </Routes>
     </BrowserRouter>
   );

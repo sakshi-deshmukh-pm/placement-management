@@ -14,8 +14,6 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  MenuItem,
-  TextField,
   Table,
   TableBody,
   TableCell,
@@ -23,10 +21,30 @@ import {
   TableHead,
   TableRow,
 } from "@mui/material";
+
 import FormikTextField from "../components/forms/FormikTextField";
 import FormikSelectField from "../components/forms/FormikSelectField";
 import FormikDateField from "../components/forms/FormikDateField";
 import { interviewValidationSchema } from "../validation/validationSchemas";
+
+interface Application {
+  id: number;
+  status?: string;
+  user?: {
+    id: number;
+    name: string | null;
+    email: string;
+    rollNumber?: string | null;
+    branch?: string | null;
+    year?: string | null;
+  };
+  placementDrive?: {
+    role: string;
+    company?: {
+      name: string;
+    };
+  };
+}
 
 interface Interview {
   id: number;
@@ -37,22 +55,7 @@ interface Interview {
   meetingLink: string | null;
   status: string;
   feedback: string | null;
-  application?: {
-    user?: {
-      id: number;
-      name: string | null;
-      email: string;
-      rollNumber: string | null;
-      branch: string | null;
-      year: string | null;
-    };
-    placementDrive?: {
-      role: string;
-      company?: {
-        name: string;
-      };
-    };
-  };
+  application?: Application;
 }
 
 interface InterviewFormValues {
@@ -114,12 +117,16 @@ const getErrorMessage = (err: unknown, fallback: string): string => {
 
 export default function ManageInterviews() {
   const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingApplications, setLoadingApplications] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [form, setForm] = useState<InterviewFormValues>({ ...emptyForm });
+  const [form, setForm] = useState<InterviewFormValues>({
+    ...emptyForm,
+  });
 
   const fetchInterviews = useCallback(async () => {
     setLoading(true);
@@ -135,9 +142,25 @@ export default function ManageInterviews() {
     }
   }, []);
 
+  const fetchApplications = useCallback(async () => {
+    setLoadingApplications(true);
+
+    try {
+      const response = await axiosInstance.get("/applications");
+      setApplications(response.data.data ?? []);
+    } catch (err: unknown) {
+      setError(
+        getErrorMessage(err, "Failed to fetch applications for scheduling.")
+      );
+    } finally {
+      setLoadingApplications(false);
+    }
+  }, []);
+
   useEffect(() => {
     void fetchInterviews();
-  }, [fetchInterviews]);
+    void fetchApplications();
+  }, [fetchInterviews, fetchApplications]);
 
   const openAddDialog = () => {
     setEditingId(null);
@@ -145,6 +168,8 @@ export default function ManageInterviews() {
     setError("");
     setSuccess("");
     setDialogOpen(true);
+
+    void fetchApplications();
   };
 
   const openEditDialog = (interview: Interview) => {
@@ -198,6 +223,21 @@ export default function ManageInterviews() {
   const completedCount = interviews.filter(
     (interview) => interview.status === "COMPLETED"
   ).length;
+
+  const applicationOptions = applications.map((application) => {
+    const studentName =
+      application.user?.name || application.user?.email || "Unknown student";
+
+    const companyName =
+      application.placementDrive?.company?.name || "Unknown company";
+
+    const role = application.placementDrive?.role || "Unknown role";
+
+    return {
+      label: `#${application.id} - ${studentName} - ${companyName} - ${role}`,
+      value: String(application.id),
+    };
+  });
 
   return (
     <Box sx={{ p: { xs: 2, md: 3 } }}>
@@ -300,8 +340,11 @@ export default function ManageInterviews() {
         </h2>
 
         <Button
-          onClick={() => void fetchInterviews()}
-          disabled={loading}
+          onClick={() => {
+            void fetchInterviews();
+            void fetchApplications();
+          }}
+          disabled={loading || loadingApplications}
         >
           Refresh
         </Button>
@@ -436,6 +479,10 @@ export default function ManageInterviews() {
             try {
               const scheduledDate = new Date(values.scheduledAt);
 
+              if (Number.isNaN(scheduledDate.getTime())) {
+                throw new Error("Please select a valid interview date and time.");
+              }
+
               const payload = {
                 applicationId: Number(values.applicationId),
                 round: values.round.trim(),
@@ -445,6 +492,11 @@ export default function ManageInterviews() {
                 status: values.status,
                 feedback: values.feedback.trim() || null,
               };
+
+              if (!payload.applicationId) {
+                setError("Please select an application.");
+                return;
+              }
 
               if (editingId !== null) {
                 await axiosInstance.patch(
@@ -476,7 +528,7 @@ export default function ManageInterviews() {
             }
           }}
         >
-          {({ isSubmitting, values, setFieldValue }) => (
+          {({ isSubmitting, values }) => (
             <Form>
               <DialogContent>
                 <Box
@@ -489,13 +541,42 @@ export default function ManageInterviews() {
                 >
                   {error && <Alert severity="error">{error}</Alert>}
 
-                  <FormikTextField
-                    name="applicationId"
-                    label="Application ID"
-                    type="number"
-                    required
-                    disabled={isSubmitting}
-                  />
+                  {editingId === null ? (
+                    loadingApplications ? (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 1,
+                          py: 1,
+                        }}
+                      >
+                        <CircularProgress size={20} />
+                        Loading applications...
+                      </Box>
+                    ) : applications.length === 0 ? (
+                      <Alert severity="warning">
+                        No applications are available. Make sure the
+                        applications API returns the application list.
+                      </Alert>
+                    ) : (
+                      <FormikSelectField
+                        name="applicationId"
+                        label="Select Application"
+                        required
+                        disabled={isSubmitting}
+                        options={applicationOptions}
+                      />
+                    )
+                  ) : (
+                    <FormikTextField
+                      name="applicationId"
+                      label="Application ID"
+                      type="number"
+                      required
+                      disabled
+                    />
+                  )}
 
                   <FormikTextField
                     name="round"
@@ -574,7 +655,11 @@ export default function ManageInterviews() {
                 <Button
                   type="submit"
                   variant="contained"
-                  disabled={isSubmitting}
+                  disabled={
+                    isSubmitting ||
+                    (editingId === null &&
+                      (loadingApplications || applications.length === 0))
+                  }
                 >
                   {isSubmitting ? (
                     <CircularProgress size={22} color="inherit" />

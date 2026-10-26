@@ -24,34 +24,16 @@ export const addPlacementDrive = async (
       eligibilityCriteria,
       deadline,
       companyId,
+      status,
     } = req.body;
 
-    if (
-      typeof role !== "string" ||
-      !role.trim() ||
-      typeof salaryPackage !== "number" ||
-      !Number.isFinite(salaryPackage) ||
-      salaryPackage <= 0 ||
-      typeof eligibilityCriteria !== "string" ||
-      !eligibilityCriteria.trim() ||
-      typeof deadline !== "string" ||
-      Number.isNaN(Date.parse(deadline)) ||
-      !Number.isInteger(companyId) ||
-      companyId <= 0
-    ) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid placement drive details",
-      });
-      return;
-    }
-
     const placementDrive = await createPlacementDrive({
-      role: role.trim(),
+      role,
       package: salaryPackage,
-      eligibilityCriteria: eligibilityCriteria.trim(),
+      eligibilityCriteria,
       deadline: new Date(deadline),
       companyId,
+      ...(status !== undefined && { status }),
     });
 
     res.status(201).json({
@@ -66,7 +48,7 @@ export const addPlacementDrive = async (
 
 // GET /placement-drives
 export const fetchPlacementDrives = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
@@ -91,15 +73,6 @@ export const fetchPlacementDriveById = async (
 ): Promise<void> => {
   try {
     const id = Number(req.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid placement drive ID",
-      });
-      return;
-    }
-
     const placementDrive = await getPlacementDriveById(id);
 
     if (!placementDrive) {
@@ -128,43 +101,6 @@ export const editPlacementDrive = async (
 ): Promise<void> => {
   try {
     const id = Number(req.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid placement drive ID",
-      });
-      return;
-    }
-
-    const {
-      role,
-      package: salaryPackage,
-      eligibilityCriteria,
-      deadline,
-      companyId,
-    } = req.body;
-
-    if (
-      typeof role !== "string" ||
-      !role.trim() ||
-      typeof salaryPackage !== "number" ||
-      !Number.isFinite(salaryPackage) ||
-      salaryPackage <= 0 ||
-      typeof eligibilityCriteria !== "string" ||
-      !eligibilityCriteria.trim() ||
-      typeof deadline !== "string" ||
-      Number.isNaN(Date.parse(deadline)) ||
-      !Number.isInteger(companyId) ||
-      companyId <= 0
-    ) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid placement drive details",
-      });
-      return;
-    }
-
     const existingDrive = await getPlacementDriveById(id);
 
     if (!existingDrive) {
@@ -175,12 +111,22 @@ export const editPlacementDrive = async (
       return;
     }
 
-    const updatedDrive = await updatePlacementDrive(id, {
-      role: role.trim(),
+    const {
+      role,
       package: salaryPackage,
-      eligibilityCriteria: eligibilityCriteria.trim(),
+      eligibilityCriteria,
+      deadline,
+      companyId,
+      status,
+    } = req.body;
+
+    const updatedDrive = await updatePlacementDrive(id, {
+      role,
+      package: salaryPackage,
+      eligibilityCriteria,
       deadline: new Date(deadline),
       companyId,
+      ...(status !== undefined && { status }),
     });
 
     res.status(200).json({
@@ -201,11 +147,12 @@ export const partiallyUpdatePlacementDrive = async (
 ): Promise<void> => {
   try {
     const id = Number(req.params.id);
+    const existingDrive = await getPlacementDriveById(id);
 
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid placement drive ID",
+    if (!existingDrive) {
+      res.status(404).json({
+        statusCode: 404,
+        message: "Placement drive not found",
       });
       return;
     }
@@ -219,28 +166,6 @@ export const partiallyUpdatePlacementDrive = async (
       status,
     } = req.body;
 
-    const allowedFields = [
-      "role",
-      "package",
-      "eligibilityCriteria",
-      "deadline",
-      "companyId",
-      "status",
-    ];
-
-    const suppliedFields = Object.keys(req.body);
-
-    if (
-      suppliedFields.length === 0 ||
-      suppliedFields.some((field) => !allowedFields.includes(field))
-    ) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Provide at least one valid field to update",
-      });
-      return;
-    }
-
     const data: {
       role?: string;
       package?: number;
@@ -250,97 +175,14 @@ export const partiallyUpdatePlacementDrive = async (
       status?: "OPEN" | "CLOSED";
     } = {};
 
-    if (role !== undefined) {
-      if (typeof role !== "string" || !role.trim()) {
-        res.status(400).json({
-          statusCode: 400,
-          message: "Role must be a non-empty string",
-        });
-        return;
-      }
-
-      data.role = role.trim();
-    }
-
-    if (salaryPackage !== undefined) {
-      if (
-        typeof salaryPackage !== "number" ||
-        !Number.isFinite(salaryPackage) ||
-        salaryPackage <= 0
-      ) {
-        res.status(400).json({
-          statusCode: 400,
-          message: "Package must be a positive number",
-        });
-        return;
-      }
-
-      data.package = salaryPackage;
-    }
-
+    if (role !== undefined) data.role = role;
+    if (salaryPackage !== undefined) data.package = salaryPackage;
     if (eligibilityCriteria !== undefined) {
-      if (
-        typeof eligibilityCriteria !== "string" ||
-        !eligibilityCriteria.trim()
-      ) {
-        res.status(400).json({
-          statusCode: 400,
-          message: "Eligibility criteria must be a non-empty string",
-        });
-        return;
-      }
-
-      data.eligibilityCriteria = eligibilityCriteria.trim();
+      data.eligibilityCriteria = eligibilityCriteria;
     }
-
-    if (deadline !== undefined) {
-      if (
-        typeof deadline !== "string" ||
-        Number.isNaN(Date.parse(deadline))
-      ) {
-        res.status(400).json({
-          statusCode: 400,
-          message: "Invalid deadline",
-        });
-        return;
-      }
-
-      data.deadline = new Date(deadline);
-    }
-
-    if (companyId !== undefined) {
-      if (!Number.isInteger(companyId) || companyId <= 0) {
-        res.status(400).json({
-          statusCode: 400,
-          message: "Invalid company ID",
-        });
-        return;
-      }
-
-      data.companyId = companyId;
-    }
-
-    if (status !== undefined) {
-      if (status !== "OPEN" && status !== "CLOSED") {
-        res.status(400).json({
-          statusCode: 400,
-          message: "Status must be OPEN or CLOSED",
-        });
-        return;
-      }
-
-      data.status = status;
-    }
-
-    const existingDrive = await getPlacementDriveById(id);
-
-    if (!existingDrive) {
-      res.status(404).json({
-        statusCode: 404,
-        message: "Placement drive not found",
-      });
-      return;
-    }
+    if (deadline !== undefined) data.deadline = new Date(deadline);
+    if (companyId !== undefined) data.companyId = companyId;
+    if (status !== undefined) data.status = status;
 
     const updatedDrive = await patchPlacementDrive(id, data);
 
@@ -362,15 +204,6 @@ export const removePlacementDrive = async (
 ): Promise<void> => {
   try {
     const id = Number(req.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid placement drive ID",
-      });
-      return;
-    }
-
     const existingDrive = await getPlacementDriveById(id);
 
     if (!existingDrive) {

@@ -1,5 +1,8 @@
 import express from "express";
 
+import { validate } from "../middleware/validate.middleware.js";
+import { createStudentSchema } from "../dtos/student/create-student.dto.js";
+
 import {
   addStudent,
   deleteStudentById,
@@ -9,11 +12,12 @@ import {
   testError,
   updateStudent,
 } from "../controllers/student.controller.js";
-
-import studentValidation from "../middleware/studentValidation.middleware.js";
 import { authenticate } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/authorize.middleware.js";
 import { authorizeStudentAccess } from "../middleware/studentAccess.middleware.js";
+import { studentQuerySchema } from "../dtos/student/student-query.dto.js";
+import { studentIdSchema } from "../dtos/student/student-id.dto.js";
+import { updateStudentSchema,replaceStudentSchema } from "../dtos/student/update-student.dto.js";
 
 const router = express.Router();
 
@@ -22,6 +26,7 @@ router.get(
   "/students",
   authenticate,
   authorizeRoles("ADMIN", "PLACEMENT_COORDINATOR"),
+  validate(studentQuerySchema,"query"),
   getStudents
 );
 
@@ -30,7 +35,7 @@ router.post(
   "/students",
   authenticate,
   authorizeRoles("ADMIN", "PLACEMENT_COORDINATOR"),
-  studentValidation,
+  validate(createStudentSchema),
   addStudent
 );
 
@@ -39,6 +44,7 @@ router.get(
   "/students/:id",
   authenticate,
   authorizeStudentAccess,
+  validate(studentIdSchema,"params"),
   getStudentById
 );
 
@@ -46,14 +52,18 @@ router.get(
 router.put(
   "/students/:id",
   authenticate,
+  validate(studentIdSchema,"params"),
   authorizeStudentAccess,
+  validate(replaceStudentSchema),
   updateStudent
 );
 
 router.patch(
   "/students/:id",
   authenticate,
+  validate(studentIdSchema,"params"),
   authorizeStudentAccess,
+  validate(updateStudentSchema),
   patchStudent
 );
 
@@ -61,6 +71,7 @@ router.patch(
 router.delete(
   "/students/:id",
   authenticate,
+  validate(studentIdSchema,"params"),
   authorizeRoles("ADMIN", "PLACEMENT_COORDINATOR"),
   deleteStudentById
 );

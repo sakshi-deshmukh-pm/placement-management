@@ -31,7 +31,7 @@ export const addCompany = async (
 
 // GET /companies
 export const fetchCompanies = async (
-  req: Request,
+  _req: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
@@ -57,24 +57,6 @@ export const editComapny = async (
   try {
     const id = Number(req.params.id);
 
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid company ID",
-      });
-      return;
-    }
-
-    const { name, website, industry, location } = req.body;
-
-    if (typeof name !== "string" || name.trim() === "") {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Company name is required",
-      });
-      return;
-    }
-
     const companyExists = await getCompanyById(id);
 
     if (!companyExists) {
@@ -85,8 +67,10 @@ export const editComapny = async (
       return;
     }
 
+    const { name, website, industry, location } = req.body;
+
     const company = await updateComapny(id, {
-      name: name.trim(),
+      name,
       ...(website !== undefined && { website }),
       ...(industry !== undefined && { industry }),
       ...(location !== undefined && { location }),
@@ -111,59 +95,6 @@ export const partialUpdateCompany = async (
   try {
     const id = Number(req.params.id);
 
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid company ID",
-      });
-      return;
-    }
-
-    const { name, website, industry, location } = req.body;
-
-    const allowedFields = ["name", "website", "industry", "location"];
-    const suppliedFields = Object.keys(req.body);
-
-    if (
-      suppliedFields.length === 0 ||
-      suppliedFields.some((field) => !allowedFields.includes(field))
-    ) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Provide at least one valid field to update",
-      });
-      return;
-    }
-
-    if (
-      name !== undefined &&
-      (typeof name !== "string" || name.trim() === "")
-    ) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Name must be a non-empty string",
-      });
-      return;
-    }
-
-    for (const [field, value] of Object.entries({
-      website,
-      industry,
-      location,
-    })) {
-      if (
-        value !== undefined &&
-        value !== null &&
-        typeof value !== "string"
-      ) {
-        res.status(400).json({
-          statusCode: 400,
-          message: `${field} must be a string or null`,
-        });
-        return;
-      }
-    }
-
     const companyExists = await getCompanyById(id);
 
     if (!companyExists) {
@@ -174,8 +105,10 @@ export const partialUpdateCompany = async (
       return;
     }
 
+    const { name, website, industry, location } = req.body;
+
     const company = await patchCompany(id, {
-      ...(name !== undefined && { name: name.trim() }),
+      ...(name !== undefined && { name }),
       ...(website !== undefined && { website }),
       ...(industry !== undefined && { industry }),
       ...(location !== undefined && { location }),
@@ -199,14 +132,6 @@ export const fetchCompanyById = async (
 ): Promise<void> => {
   try {
     const id = Number(req.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid company ID",
-      });
-      return;
-    }
 
     const company = await getCompanyById(id);
 
@@ -236,14 +161,6 @@ export const removeCompany = async (
 ): Promise<void> => {
   try {
     const id = Number(req.params.id);
-
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid company ID",
-      });
-      return;
-    }
 
     const company = await getCompanyById(id);
 

@@ -1,5 +1,6 @@
 
 import type { Request, Response, NextFunction } from "express";
+import type { ApplicationStatus } from "../generated/prisma/client.js";
 
 import {
   createApplication,
@@ -18,6 +19,7 @@ const isPrismaErrorCode = (
   error.code === code;
 
 // GET /applications
+
 export const getApplication = async (
   req: Request,
   res: Response,
@@ -38,14 +40,6 @@ export const getApplication = async (
 
     const { role, id } = auth;
 
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(401).json({
-        statusCode: 401,
-        message: "Valid authenticated user ID is required",
-      });
-      return;
-    }
-
     if (
       role !== "ADMIN" &&
       role !== "PLACEMENT_COORDINATOR" &&
@@ -58,22 +52,85 @@ export const getApplication = async (
       return;
     }
 
-    // Admins and placement coordinators can view all applications.
-    // Students can view only their own applications.
-    const applications =
+    const page = Number(req.query.page ?? 1);
+    const pageSize = Number(req.query.pageSize ?? 10);
+    const search =
+      typeof req.query.search === "string"
+        ? req.query.search.trim()
+        : "";
+
+    const rawStatus =
+      typeof req.query.status === "string"
+        ? req.query.status
+        : undefined;
+
+    const validStatuses: ApplicationStatus[] = [
+      "APPLIED",
+      "SHORTLISTED",
+      "SELECTED",
+      "REJECTED",
+    ];
+
+    if (
+      !Number.isInteger(page) ||
+      page < 1 ||
+      !Number.isInteger(pageSize) ||
+      pageSize < 1 ||
+      pageSize > 100
+    ) {
+      res.status(400).json({
+        statusCode: 400,
+        message:
+          "Page must be at least 1 and pageSize must be between 1 and 100",
+      });
+      return;
+    }
+
+    if (
+      rawStatus !== undefined &&
+      rawStatus !== "ALL" &&
+      !validStatuses.includes(rawStatus as ApplicationStatus)
+    ) {
+      res.status(400).json({
+        statusCode: 400,
+        message: "Invalid application status",
+      });
+      return;
+    }
+
+    const status =
+      rawStatus && rawStatus !== "ALL"
+        ? (rawStatus as ApplicationStatus)
+        : undefined;
+
+    const result =
       role === "ADMIN" || role === "PLACEMENT_COORDINATOR"
-        ? await getApplications()
-        : await getApplications(id);
+        ? await getApplications(
+            undefined,
+            page,
+            pageSize,
+            search,
+            status,
+          )
+        : await getApplications(
+            id,
+            page,
+            pageSize,
+            search,
+            status,
+          );
 
     res.status(200).json({
       statusCode: 200,
       message: "Applications fetched successfully",
-      data: applications,
+      data: result.applications,
+      pagination: result.pagination,
     });
   } catch (error: unknown) {
     next(error);
   }
 };
+
 
 // POST /applications
 export const addApplication = async (
@@ -94,10 +151,7 @@ export const addApplication = async (
       return;
     }
 
-    const { id, role } = auth;
-    const { placementDriveId } = req.body;
-
-    if (role !== "STUDENT") {
+    if (auth.role !== "STUDENT") {
       res.status(403).json({
         statusCode: 403,
         message: "Only students can submit applications",
@@ -105,25 +159,10 @@ export const addApplication = async (
       return;
     }
 
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(401).json({
-        statusCode: 401,
-        message: "Valid authenticated user ID is required",
-      });
-      return;
-    }
+    const { placementDriveId } = req.body;
 
-    const driveId = Number(placementDriveId);
-
-    if (!Number.isInteger(driveId) || driveId <= 0) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Valid placement drive ID is required",
-      });
-      return;
-    }
-
-    const eligibility = await findEligiblePlacementDrive(driveId);
+    // Always use the authenticated student's ID.
+    const eligibility = await findEligiblePlacementDrive(placementDriveId);
 
     if (!eligibility.eligible) {
       const statusCode = eligibility.statusCode ?? 400;
@@ -135,8 +174,7 @@ export const addApplication = async (
       return;
     }
 
-    // Use the authenticated user's ID, not an ID supplied by the client.
-    const application = await createApplication(id, driveId);
+    const application = await createApplication(auth.id, placementDriveId);
 
     res.status(201).json({
       statusCode: 201,
@@ -156,7 +194,7 @@ export const addApplication = async (
   }
 };
 
-// PATCH /applications/:id/status
+// PATCH /applications/:id
 export const changeApplicationStatus = async (
   req: Request,
   res: Response,
@@ -175,7 +213,6 @@ export const changeApplicationStatus = async (
       return;
     }
 
-    // Only admins and placement coordinators may change application status.
     if (
       auth.role !== "ADMIN" &&
       auth.role !== "PLACEMENT_COORDINATOR"
@@ -190,33 +227,10 @@ export const changeApplicationStatus = async (
     const id = Number(req.params.id);
     const { status } = req.body;
 
-    const allowedStatuses = [
-      "APPLIED",
-      "SHORTLISTED",
-      "REJECTED",
-      "SELECTED",
-    ];
-
-    if (!Number.isInteger(id) || id <= 0) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Valid application ID is required",
-      });
-      return;
-    }
-
-    if (
-      typeof status !== "string" ||
-      !allowedStatuses.includes(status)
-    ) {
-      res.status(400).json({
-        statusCode: 400,
-        message: "Invalid application status",
-      });
-      return;
-    }
-
-    const application = await updateApplicationStatus(id, status);
+    const application = await updateApplicationStatus(
+      id,
+      status as ApplicationStatus,
+    );
 
     if (!application) {
       res.status(404).json({

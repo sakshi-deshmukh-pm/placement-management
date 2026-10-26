@@ -5,7 +5,6 @@ type Role =
     | "ADMIN"
     | "STUDENT"
     | "PLACEMENT_COORDINATOR"
-    | "RECRUITER";
 
 export const authorizeRoles = (...allowedRoles: Role[]) => {
     return (

@@ -1,5 +1,6 @@
-
+import { Prisma } from "../generated/prisma/client.js";
 import prisma from "../prisma.js";
+import type { ApplicationStatus } from "../generated/prisma/client.js";
 
 export const createApplication = async (
     userId: number,
@@ -13,50 +14,120 @@ export const createApplication = async (
     });
 };
 
-export const getApplications = async (
-    userId?: number
-) => {
-    return await prisma.application.findMany({
-        ...(userId !== undefined ? {
-            where: { userId }
-        } : {}),
 
-    orderBy: {
-        appliedAt: "desc"
-    },
-         select: {
-            id: true,
-            status: true,
-            appliedAt: true,
-            user: {
-                select: {
-                    id: true,
-                    name: true,
-                    email: true
-                }
+export const getApplications = async (
+  userId?: number,
+  page = 1,
+  pageSize = 10,
+  search = "",
+  status?: ApplicationStatus,
+) => {
+  const where: Prisma.ApplicationWhereInput = {
+    ...(userId !== undefined ? { userId } : {}),
+    ...(status !== undefined ? { status } : {}),
+    ...(search.trim()
+      ? {
+          OR: [
+            {
+              user: {
+                name: {
+                  contains: search.trim(),
+                  mode: "insensitive",
+                },
+              },
             },
-            placementDrive: {
-                select: {
-                    id: true,
-                    role: true,
-                    package: true,
-                    deadline: true,
-                    company: {
-                        select: {
-                            id: true,
-                            name: true,
-                            location: true
-                        }
-                    }
-                }
-            }
+            {
+              user: {
+                email: {
+                  contains: search.trim(),
+                  mode: "insensitive",
+                },
+              },
+            },
+            {
+              placementDrive: {
+                role: {
+                  contains: search.trim(),
+                  mode: "insensitive",
+                },
+              },
+            },
+            {
+              placementDrive: {
+                company: {
+                  name: {
+                    contains: search.trim(),
+                    mode: "insensitive",
+                  },
+                },
+              },
+            },
+            ...(Number.isInteger(Number(search.trim())) &&
+            search.trim() !== ""
+              ? [{ id: Number(search.trim()) }]
+              : []),
+          ],
         }
-    });
+      : {}),
+  };
+
+  const skip = (page - 1) * pageSize;
+
+  const [applications, total] = await prisma.$transaction([
+    prisma.application.findMany({
+      where,
+      skip,
+      take: pageSize,
+      orderBy: {
+        appliedAt: "desc",
+      },
+      select: {
+        id: true,
+        status: true,
+        appliedAt: true,
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        placementDrive: {
+          select: {
+            id: true,
+            role: true,
+            package: true,
+            deadline: true,
+            company: {
+              select: {
+                id: true,
+                name: true,
+                location: true,
+              },
+            },
+          },
+        },
+      },
+    }),
+    prisma.application.count({ where }),
+  ]);
+
+  return {
+    applications,
+    pagination: {
+      page,
+      pageSize,
+      total,
+      totalPages: Math.ceil(total / pageSize),
+    },
+  };
 };
+
+
 
 export const updateApplicationStatus = async (
     id: number,
-    status: string
+    status: ApplicationStatus
 ) => {
     return await prisma.application.update({
         where: { id },

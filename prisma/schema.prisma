@@ -66,21 +66,44 @@ model Application {
   id               Int            @id @default(autoincrement())
   userId           Int
   placementDriveId Int
-  status           String         @default("APPLIED")
+  status ApplicationStatus @default(APPLIED)
   appliedAt        DateTime       @default(now())
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
 
   user             User           @relation(fields: [userId], references: [id])
   placementDrive   PlacementDrive @relation(fields: [placementDriveId], references: [id])
+  interviews       Interview[]
 
-  // A user can apply only once to each placement drive
   @@unique([userId, placementDriveId])
 }
+model Interview {
+  id            Int         @id @default(autoincrement())
+  applicationId Int
+  round         String
+  scheduledAt   DateTime
+  mode          String      @default("ONLINE")
+  meetingLink   String?
+  status        String      @default("SCHEDULED")
+  feedback      String?
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  application   Application @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+
+  @@index([applicationId])
+}
+
 
 enum Role {
   ADMIN
   STUDENT
   PLACEMENT_COORDINATOR
-  RECRUITER
+}
+
+enum ApplicationStatus {
+  APPLIED
+  SHORTLISTED
+  SELECTED
+  REJECTED
 }

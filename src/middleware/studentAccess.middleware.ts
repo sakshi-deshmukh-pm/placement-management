@@ -5,7 +5,7 @@ type UserRole =
     | "ADMIN"
     | "STUDENT"
     | "PLACEMENT_COORDINATOR"
-    | "RECRUITER";
+
 
 type AuthUser = {
     id: number;

@@ -1,5 +1,11 @@
+
 import { Router } from "express";
 import { authenticate } from "../middleware/auth.middleware.js";
+import { validate } from "../middleware/validate.middleware.js";
+
+import { loginSchema } from "../dtos/auth/login.dto.js";
+import { registerSchema } from "../dtos/auth/register.dto.js";
+import { updateProfileSchema } from "../dtos/auth/update-profile.dto.js";
 
 import {
   register,
@@ -10,10 +16,24 @@ import {
 
 const router = Router();
 
-router.post("/auth/register", register);
-router.post("/auth/login", login);
+router.post(
+  "/auth/register",
+  validate(registerSchema),
+  register
+);
+
+router.post(
+  "/auth/login",
+  validate(loginSchema),
+  login
+);
 
 router.get("/auth/me", authenticate, getMyProfile);
-router.patch("/auth/me", authenticate, updateMyProfile);
+router.patch(
+  "/auth/me",
+  authenticate,
+  validate(updateProfileSchema),
+  updateMyProfile
+);
 
 export default router;

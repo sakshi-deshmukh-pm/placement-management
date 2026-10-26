@@ -9,7 +9,7 @@ import PlacementDriveRoutes  from "./routes/placementDrive.routes.js";
 import applicationRoutes from "./routes/application.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import loggerMiddleware from "./middleware/logger.middleware.js";
-
+import interviewRoutes from "./routes/interview.routes.js"
 
 const app = express();
 
@@ -27,6 +27,8 @@ app.use(companyRoutes);
 app.use(applicationRoutes)
 
 app.use(PlacementDriveRoutes);
+
+app.use(interviewRoutes);
 
 app.use(authRoutes);
 

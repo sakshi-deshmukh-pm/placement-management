@@ -29,16 +29,7 @@ async function main(): Promise<void> {
         },
     });
 
-    const recruiter = await prisma.user.upsert({
-        where: { email: "recruiter@example.com" },
-        update: {},
-        create: {
-            email: "recruiter@example.com",
-            passwordHash,
-            role: Role.RECRUITER,
-            name: "Company Recruiter",
-        },
-    });
+
 
     const student = await prisma.user.upsert({
         where: { email: "student@example.com" },
@@ -252,7 +243,6 @@ async function main(): Promise<void> {
     logger.info("Seed completed successfully.", {
         admin: admin.email,
         coordinator: coordinator.email,
-        recruiter: recruiter.email,
         student: student.email,
         company: company.name,
         placementDrive: placementDrive.role,

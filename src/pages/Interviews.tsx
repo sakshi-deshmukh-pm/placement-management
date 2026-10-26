@@ -1,11 +1,14 @@
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  Alert,
   Avatar,
   Box,
+  Button,
   Card,
   CardContent,
   Chip,
+  CircularProgress,
   MenuItem,
   Select,
   Typography,
@@ -15,13 +18,39 @@ import EventAvailableRoundedIcon from "@mui/icons-material/EventAvailableRounded
 import BusinessRoundedIcon from "@mui/icons-material/BusinessRounded";
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import LocationOnRoundedIcon from "@mui/icons-material/LocationOnRounded";
+import VideocamRoundedIcon from "@mui/icons-material/VideocamRounded";
 
-type InterviewStatus =
-  | "SCHEDULED"
-  | "COMPLETED"
-  | "CANCELLED";
+import axiosInstance from "../api/axiosInstance";
 
-type Interview = {
+type InterviewStatus = "SCHEDULED" | "COMPLETED" | "CANCELLED";
+
+interface InterviewApiItem {
+  id: number;
+  round: string;
+  scheduledAt: string;
+  mode: string;
+  meetingLink?: string | null;
+  status: InterviewStatus;
+  feedback?: string | null;
+  application: {
+    user: {
+      id: number;
+      name: string;
+      email: string;
+      rollNumber: string;
+      branch: string;
+      year: number;
+    };
+    placementDrive: {
+      company: {
+        name: string;
+      };
+      [key: string]: unknown;
+    };
+  };
+}
+
+interface Interview {
   id: number;
   company: string;
   role: string;
@@ -30,49 +59,166 @@ type Interview = {
   time: string;
   mode: string;
   location: string;
+  meetingLink?: string | null;
   status: InterviewStatus;
-};
+  feedback?: string | null;
+  studentId: number;
+}
 
-const sampleInterviews: Interview[] = [
-  {
-    id: 1,
-    company: "Tech Solutions",
-    role: "Software Developer",
-    round: "Technical Interview",
-    date: "2026-11-05",
-    time: "10:00 AM",
-    mode: "Online",
-    location: "Google Meet",
-    status: "SCHEDULED",
-  },
-  {
-    id: 2,
-    company: "Digital Systems",
-    role: "Frontend Developer",
-    round: "HR Interview",
-    date: "2026-10-10",
-    time: "02:00 PM",
-    mode: "Offline",
-    location: "Pune",
-    status: "COMPLETED",
-  },
-];
+interface ApiResponse {
+  message: string;
+  data: InterviewApiItem[];
+}
 
 function formatDate(value: string) {
-  return new Date(`${value}T00:00:00`).toLocaleDateString("en-IN", {
+  return new Date(value).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
     year: "numeric",
   });
 }
 
+function formatTime(value: string) {
+  return new Date(value).toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function getRole(drive: Record<string, unknown>) {
+  const possibleFields = ["jobRole", "role", "title", "position"];
+
+  for (const field of possibleFields) {
+    const value = drive[field];
+
+    if (typeof value === "string" && value.trim()) {
+      return value;
+    }
+  }
+
+  return "Placement Opportunity";
+}
+
+function getCurrentUserId(): number | null {
+  // Update this function to match the user object stored by your login flow.
+  const possibleKeys = ["user", "loggedInUser", "currentUser"];
+
+  for (const key of possibleKeys) {
+    const rawValue = localStorage.getItem(key);
+
+    if (!rawValue) continue;
+
+    try {
+      const parsed = JSON.parse(rawValue) as {
+        id?: number | string;
+        user?: { id?: number | string };
+      };
+
+      const id = parsed.user?.id ?? parsed.id;
+      const numericId = Number(id);
+
+      if (Number.isInteger(numericId) && numericId > 0) {
+        return numericId;
+      }
+    } catch {
+      // Ignore values that are not JSON.
+    }
+  }
+
+  return null;
+}
+
 function Interviews() {
   const [filter, setFilter] = useState("ALL");
+  const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const interviews = sampleInterviews.filter(
-    (interview) =>
-      filter === "ALL" || interview.status === filter
+  useEffect(() => {
+    let active = true;
+
+    const fetchInterviews = async () => {
+      try {
+        setLoading(true);
+        setError("");
+
+        const response =
+          await axiosInstance.get<ApiResponse>("/interviews");
+
+        if (!active) return;
+
+        const currentUserId = getCurrentUserId();
+
+        if (currentUserId === null) {
+          setInterviews([]);
+          setError(
+            "Unable to identify the logged-in student. Please check your login user storage."
+          );
+          return;
+        }
+
+        const mappedInterviews: Interview[] = response.data.data
+          .filter(
+            (item) => item.application.user.id === currentUserId
+          )
+          .map((item) => {
+            const drive = item.application.placementDrive;
+
+            return {
+              id: item.id,
+              company: drive.company.name,
+              role: getRole(drive),
+              round: item.round,
+              date: item.scheduledAt,
+              time: formatTime(item.scheduledAt),
+              mode: item.mode,
+              location:
+                item.meetingLink ||
+                (item.mode === "ONLINE" ? "Online meeting" : "Venue not specified"),
+              meetingLink: item.meetingLink,
+              status: item.status,
+              feedback: item.feedback,
+              studentId: item.application.user.id,
+            };
+          });
+
+        setInterviews(mappedInterviews);
+      } catch {
+        if (active) {
+          setError(
+            "Unable to load interviews. Please try again."
+          );
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    void fetchInterviews();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const filteredInterviews = useMemo(
+    () =>
+      interviews.filter(
+        (interview) =>
+          filter === "ALL" || interview.status === filter
+      ),
+    [interviews, filter]
   );
+
+  const scheduledCount = interviews.filter(
+    (item) => item.status === "SCHEDULED"
+  ).length;
+
+  const completedCount = interviews.filter(
+    (item) => item.status === "COMPLETED"
+  ).length;
 
   const statusStyle = (status: InterviewStatus) => {
     switch (status) {
@@ -134,6 +280,7 @@ function Interviews() {
           value={filter}
           onChange={(event) => setFilter(event.target.value)}
           sx={{ minWidth: 170, borderRadius: 2.5 }}
+          aria-label="Filter interviews by status"
         >
           <MenuItem value="ALL">All Interviews</MenuItem>
           <MenuItem value="SCHEDULED">Scheduled</MenuItem>
@@ -141,6 +288,19 @@ function Interviews() {
           <MenuItem value="CANCELLED">Cancelled</MenuItem>
         </Select>
       </Box>
+
+      {error && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {error}
+          <Button
+            size="small"
+            onClick={() => window.location.reload()}
+            sx={{ ml: 1 }}
+          >
+            Retry
+          </Button>
+        </Alert>
+      )}
 
       <Box
         sx={{
@@ -156,21 +316,17 @@ function Interviews() {
         {[
           {
             label: "Total Interviews",
-            value: sampleInterviews.length,
+            value: interviews.length,
             color: "#2563EB",
           },
           {
             label: "Scheduled",
-            value: sampleInterviews.filter(
-              (item) => item.status === "SCHEDULED"
-            ).length,
+            value: scheduledCount,
             color: "#7C3AED",
           },
           {
             label: "Completed",
-            value: sampleInterviews.filter(
-              (item) => item.status === "COMPLETED"
-            ).length,
+            value: completedCount,
             color: "#047857",
           },
         ].map((item) => (
@@ -187,14 +343,29 @@ function Interviews() {
                 variant="h4"
                 sx={{ color: item.color, fontWeight: 800, mt: 1 }}
               >
-                {item.value}
+                {loading ? "—" : item.value}
               </Typography>
             </CardContent>
           </Card>
         ))}
       </Box>
 
-      {interviews.length === 0 ? (
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            gap: 2,
+            py: 8,
+          }}
+        >
+          <CircularProgress size={28} />
+          <Typography color="text.secondary">
+            Loading interviews...
+          </Typography>
+        </Box>
+      ) : !error && filteredInterviews.length === 0 ? (
         <Card
           elevation={0}
           sx={{ border: "1px solid #E8EDF5", borderRadius: 3 }}
@@ -207,11 +378,13 @@ function Interviews() {
               No interviews found
             </Typography>
             <Typography sx={{ color: "#64748B", mt: 1 }}>
-              There are no interviews for this filter.
+              {filter === "ALL"
+                ? "Your scheduled interviews will appear here."
+                : `There are no ${filter.toLowerCase()} interviews.`}
             </Typography>
           </CardContent>
         </Card>
-      ) : (
+      ) : !error ? (
         <Box
           sx={{
             display: "grid",
@@ -222,7 +395,7 @@ function Interviews() {
             gap: 2.5,
           }}
         >
-          {interviews.map((interview) => (
+          {filteredInterviews.map((interview) => (
             <Card
               key={interview.id}
               elevation={0}
@@ -303,22 +476,54 @@ function Interviews() {
                       sx={{ color: "#64748B", fontSize: 20 }}
                     />
                     <Typography variant="body2">
-                      {interview.mode} · {interview.location}
+                      {interview.mode} · {interview.mode === "ONLINE" ? "Online" : interview.location}
                     </Typography>
                   </Box>
+
+                  {interview.meetingLink && (
+                    <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <VideocamRoundedIcon
+                        sx={{ color: "#64748B", fontSize: 20 }}
+                      />
+                      <Button
+                        component="a"
+                        href={interview.meetingLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        size="small"
+                        sx={{ textTransform: "none" }}
+                      >
+                        Join interview
+                      </Button>
+                    </Box>
+                  )}
+
+                  {interview.feedback && (
+                    <Box
+                      sx={{
+                        mt: 1,
+                        p: 1.5,
+                        bgcolor: "#F8FAFC",
+                        borderRadius: 2,
+                      }}
+                    >
+                      <Typography
+                        variant="caption"
+                        sx={{ color: "#64748B", fontWeight: 700 }}
+                      >
+                        FEEDBACK
+                      </Typography>
+                      <Typography variant="body2" sx={{ mt: 0.5 }}>
+                        {interview.feedback}
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               </CardContent>
             </Card>
           ))}
         </Box>
-      )}
-
-      <Typography
-        variant="caption"
-        sx={{ display: "block", color: "#94A3B8", mt: 3 }}
-      >
-        Demo data only. Interview information is not yet connected to the backend.
-      </Typography>
+      ) : null}
     </Box>
   );
 }

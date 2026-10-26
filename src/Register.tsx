@@ -1,6 +1,6 @@
-
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
+import { Formik, Form } from "formik";
 
 import {
   Alert,
@@ -11,13 +11,15 @@ import {
   InputAdornment,
   Link,
   Paper,
-  TextField,
   Typography,
 } from "@mui/material";
 
 import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import SchoolOutlinedIcon from "@mui/icons-material/SchoolOutlined";
+
+import FormikTextField from "./components/forms/FormikTextField";
+import { registerValidationSchema } from "./validation/validationSchemas";
 
 type RegisterFormData = {
   name: string;
@@ -45,70 +47,37 @@ const initialFormData: RegisterFormData = {
 export default function Register() {
   const navigate = useNavigate();
 
-  const [formData, setFormData] =
-    useState<RegisterFormData>(initialFormData);
   const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  const handleSubmit = async (
+    values: RegisterFormData,
+    { setSubmitting }: {
+      setSubmitting: (isSubmitting: boolean) => void;
+    },
   ) => {
-    const { name, value } = event.target;
-
-    setFormData((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-
-    setError("");
-  };
-
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
     setError("");
 
     const payload: RegisterFormData = {
-      name: formData.name.trim(),
-      email: formData.email.trim().toLowerCase(),
-      password: formData.password,
-      rollNumber: formData.rollNumber.trim(),
-      branch: formData.branch.trim(),
-      year: formData.year.trim(),
+      name: values.name.trim(),
+      email: values.email.trim().toLowerCase(),
+      password: values.password,
+      rollNumber: values.rollNumber.trim(),
+      branch: values.branch.trim(),
+      year: values.year.trim(),
     };
 
-    if (
-      !payload.name ||
-      !payload.email ||
-      !payload.password ||
-      !payload.rollNumber ||
-      !payload.branch ||
-      !payload.year
-    ) {
-      setError("Please fill in all required fields.");
-      return;
-    }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-      setError("Please enter a valid email address.");
-      return;
-    }
-
-    if (payload.password.length < 8) {
-      setError("Password must contain at least 8 characters.");
-      return;
-    }
-
-    setLoading(true);
-
     try {
-      const response = await fetch("http://localhost:3000/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const response = await fetch(
+        "http://localhost:3000/auth/register",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      });
+      );
 
       const result: ApiResponse = await response.json();
 
@@ -136,7 +105,7 @@ export default function Register() {
         setError("An unexpected error occurred.");
       }
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -187,10 +156,7 @@ export default function Register() {
             Student Registration
           </Typography>
 
-          <Typography
-            variant="body2"
-            sx={{ color: "text.secondary" }}
-          >
+          <Typography variant="body2" sx={{ color: "text.secondary" }}>
             Create your PlaceTrack account
           </Typography>
         </Box>
@@ -201,127 +167,109 @@ export default function Register() {
           </Alert>
         )}
 
-        <Box component="form" onSubmit={handleSubmit} noValidate>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
-            <TextField
-              name="name"
-              label="Full Name"
-              value={formData.name}
-              onChange={handleChange}
-              autoComplete="name"
-              required
-              fullWidth
-              disabled={loading}
-              placeholder="Enter your full name"
-            />
+        <Formik<RegisterFormData>
+          initialValues={initialFormData}
+          validationSchema={registerValidationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form noValidate>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+                <FormikTextField
+                  name="name"
+                  label="Full Name"
+                  required
+                  disabled={isSubmitting}
+                  autoComplete="name"
+                  placeholder="Enter your full name"
+                />
 
-            <TextField
-              name="email"
-              label="Email Address"
-              type="email"
-              value={formData.email}
-              onChange={handleChange}
-              autoComplete="email"
-              required
-              fullWidth
-              disabled={loading}
-              placeholder="you@example.com"
-            />
+                <FormikTextField
+                  name="email"
+                  label="Email Address"
+                  type="email"
+                  required
+                  disabled={isSubmitting}
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                />
 
-            <TextField
-              name="password"
-              label="Password"
-              type={showPassword ? "text" : "password"}
-              value={formData.password}
-              onChange={handleChange}
-              autoComplete="new-password"
-              required
-              fullWidth
-              disabled={loading}
-              helperText="Minimum 8 characters"
-              slotProps={{
-                htmlInput: {
-                  minLength: 8,
-                },
-                input: {
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label={
-                          showPassword ? "Hide password" : "Show password"
-                        }
-                        onClick={() =>
-                          setShowPassword((previous) => !previous)
-                        }
-                        edge="end"
-                        disabled={loading}
-                      >
-                        {showPassword ? (
-                          <VisibilityOffOutlinedIcon />
-                        ) : (
-                          <VisibilityOutlinedIcon />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                },
-              }}
-            />
+                <FormikTextField
+                  name="password"
+                  label="Password"
+                  type={showPassword ? "text" : "password"}
+                  required
+                  disabled={isSubmitting}
+                  autoComplete="new-password"
+                  helperText="Minimum 8 characters"
+                  minLength={8}
+                  endAdornment={
+                    <IconButton
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      onClick={() =>
+                        setShowPassword((previous) => !previous)
+                      }
+                      edge="end"
+                      disabled={isSubmitting}
+                    >
+                      {showPassword ? (
+                        <VisibilityOffOutlinedIcon />
+                      ) : (
+                        <VisibilityOutlinedIcon />
+                      )}
+                    </IconButton>
+                  }
+                />
 
-            <TextField
-              name="rollNumber"
-              label="Roll Number"
-              value={formData.rollNumber}
-              onChange={handleChange}
-              required
-              fullWidth
-              disabled={loading}
-              placeholder="e.g. CSE2026001"
-            />
+                <FormikTextField
+                  name="rollNumber"
+                  label="Roll Number"
+                  required
+                  disabled={isSubmitting}
+                  placeholder="e.g. CSE2026001"
+                />
 
-            <TextField
-              name="branch"
-              label="Branch"
-              value={formData.branch}
-              onChange={handleChange}
-              required
-              fullWidth
-              disabled={loading}
-              placeholder="e.g. CSE, IT, ENTC"
-            />
+                <FormikTextField
+                  name="branch"
+                  label="Branch"
+                  required
+                  disabled={isSubmitting}
+                  placeholder="e.g. CSE, IT, ENTC"
+                />
 
-            <TextField
-              name="year"
-              label="Academic Year"
-              value={formData.year}
-              onChange={handleChange}
-              required
-              fullWidth
-              disabled={loading}
-              placeholder="e.g. 4th Year"
-            />
+                <FormikTextField
+                  name="year"
+                  label="Academic Year"
+                  required
+                  disabled={isSubmitting}
+                  placeholder="e.g. 4th Year"
+                />
 
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              fullWidth
-              disabled={loading}
-              sx={{
-                mt: 0.5,
-                py: 1.4,
-                borderRadius: 2,
-                textTransform: "none",
-              }}
-            >
-              {loading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Create Account"
-              )}
-            </Button>
-          </Box>
-        </Box>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  size="large"
+                  fullWidth
+                  disabled={isSubmitting}
+                  sx={{
+                    mt: 0.5,
+                    py: 1.4,
+                    borderRadius: 2,
+                    textTransform: "none",
+                  }}
+                >
+                  {isSubmitting ? (
+                    <CircularProgress size={24} color="inherit" />
+                  ) : (
+                    "Create Account"
+                  )}
+                </Button>
+              </Box>
+            </Form>
+          )}
+        </Formik>
 
         <Typography
           variant="body2"

@@ -17,10 +17,12 @@
     "@mui/x-data-grid": "^9.16.0",
     "@reduxjs/toolkit": "^2.13.0",
     "axios": "^1.20.0",
+    "formik": "^2.4.9",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-redux": "^9.3.0",
-    "react-router-dom": "^7.18.4"
+    "react-router-dom": "^7.18.4",
+    "yup": "^1.7.1"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",

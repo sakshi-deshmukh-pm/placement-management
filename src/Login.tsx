@@ -1,4 +1,3 @@
-
 import { useState, type FormEvent, type ChangeEvent } from "react";
 import {
     useLocation,
@@ -31,9 +30,11 @@ type LoginFormData = {
 };
 
 type LoginResponse = {
+    statusCode?: number;
     message?: string;
     error?: string;
     token?: string;
+    tokenType?: string;
     user?: {
         id: number;
         email: string;
@@ -119,7 +120,7 @@ export default function Login() {
 
             if (!result.token || !result.user) {
                 throw new Error(
-                    "The server did not return the token and user details.",
+                    "Login response is missing the token or user details. Check the backend response.",
                 );
             }
 
@@ -151,7 +152,7 @@ export default function Login() {
             if (err instanceof Error) {
                 setError(
                     err.message === "Failed to fetch"
-                        ? "Cannot connect to the server. Please check your connection."
+                        ? "Cannot connect to the server. Check that your backend is running on port 3000 and that CORS is configured."
                         : err.message,
                 );
             } else {
@@ -314,10 +315,7 @@ export default function Login() {
                             }}
                         >
                             {loading ? (
-                                <CircularProgress
-                                    size={24}
-                                    color="inherit"
-                                />
+                                <CircularProgress size={24} color="inherit" />
                             ) : (
                                 "Sign In"
                             )}

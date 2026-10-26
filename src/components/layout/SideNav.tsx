@@ -7,7 +7,6 @@ import {
   ListItemIcon,
   ListItemText,
   Typography,
-  Divider,
 } from "@mui/material";
 
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
@@ -109,58 +108,6 @@ function SideNav({
         boxSizing: "border-box",
       }}
     >
-      {/* Application branding */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          gap: 1.5,
-          px: 1,
-          mb: 3,
-        }}
-      >
-        <Box
-          sx={{
-            width: 42,
-            height: 42,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 2.5,
-            bgcolor: "#2458D3",
-            color: "#FFFFFF",
-            boxShadow: "0 5px 12px rgba(36, 88, 211, 0.2)",
-          }}
-        >
-          <SchoolRoundedIcon />
-        </Box>
-
-        <Box>
-          <Typography
-            sx={{
-              fontSize: 19,
-              fontWeight: 800,
-              letterSpacing: "-0.5px",
-              lineHeight: 1.3,
-              color: "#172554",
-            }}
-          >
-            PlaceTrack
-          </Typography>
-
-          <Typography
-            sx={{
-              fontSize: 11,
-              color: "#8290A5",
-              fontWeight: 500,
-            }}
-          >
-            Placement Management
-          </Typography>
-        </Box>
-      </Box>
-
-      <Divider sx={{ borderColor: "#EEF2F7", mb: 3 }} />
 
       {/* Menu heading */}
       <Typography

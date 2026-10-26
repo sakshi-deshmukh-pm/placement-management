@@ -1,4 +1,3 @@
-
 import {
   BrowserRouter,
   Navigate,
@@ -21,6 +20,7 @@ import Interviews from "./pages/Interviews";
 import ManageStudents from "./pages/ManageStudents";
 import ManageApplications from "./pages/ManageApplications";
 import ManagePlacementDrives from "./pages/ManagePlacementDrives";
+import ManageInterviews from "./pages/ManageInterviews";
 
 import {
   Box,
@@ -410,10 +410,7 @@ function App() {
             <RequireAuth>
               <RequireRole allowedRole="ADMIN">
                 <DashboardLayout>
-                  <PlaceholderPage
-                    title="Manage Interviews"
-                    description="Manage interview schedules and results."
-                  />
+                 <ManageInterviews/>
                 </DashboardLayout>
               </RequireRole>
             </RequireAuth>

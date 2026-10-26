@@ -88,3 +88,19 @@ export const countDriveApplications = async (placementDriveId: number) => {
     where: { placementDriveId },
   });
 };
+
+
+export const getDriveEligibilityData = async (placementDriveId: number) => {
+  return prisma.placementDrive.findUnique({
+    where: { id: placementDriveId },
+    include: {
+      company: true,
+      applications: {
+        select: {
+          userId: true,
+        },
+      },
+    },
+  });
+};
+

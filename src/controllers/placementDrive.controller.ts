@@ -9,6 +9,7 @@ import {
   patchPlacementDrive,
   deletePlacementDrive,
   countDriveApplications,
+  getDriveEligibilityData,
 } from "../models/placementDrive.model.js";
 
 // POST /placement-drives
@@ -236,3 +237,107 @@ export const removePlacementDrive = async (
     next(error);
   }
 };
+
+
+export const fetchDriveEligibility = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const id = Number(req.params.id);
+    const drive = await getDriveEligibilityData(id);
+
+    if (!drive) {
+      res.status(404).json({
+        statusCode: 404,
+        message: "Placement drive not found",
+      });
+      return;
+    }
+
+    const students = await import("../prisma.js").then(async ({ default: prisma }) =>
+      prisma.user.findMany({
+        where: {
+          role: "STUDENT",
+          isActive: true,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          rollNumber: true,
+          branch: true,
+          year: true,
+        },
+        orderBy: { name: "asc" },
+      })
+    );
+
+    const appliedUserIds = new Set(
+      drive.applications.map((application) => application.userId),
+    );
+
+    const criteria = drive.eligibilityCriteria.toLowerCase();
+
+    const requiredBranches = [
+      "cse",
+      "computer science",
+      "it",
+      "information technology",
+      "entc",
+      "electronics",
+      "mechanical",
+      "civil",
+    ].filter((branch) => criteria.includes(branch));
+
+    const yearMatches = criteria.match(/\b20\d{2}\b/g);
+    const requiredYear = yearMatches?.find((year) =>
+      students.some((student) => student.year === year)
+    );
+
+    const results = students.map((student) => {
+      const reasons: string[] = [];
+
+      if (
+        requiredBranches.length > 0 &&
+        !requiredBranches.some((branch) =>
+          (student.branch ?? "").toLowerCase().includes(branch)
+        )
+      ) {
+        reasons.push("Branch does not match");
+      }
+
+      if (requiredYear && student.year !== requiredYear) {
+        reasons.push(`Graduation year must be ${requiredYear}`);
+      }
+
+      return {
+        ...student,
+        alreadyApplied: appliedUserIds.has(student.id),
+        eligible: reasons.length === 0,
+        reasons,
+      };
+    });
+
+    res.status(200).json({
+      statusCode: 200,
+      message: "Eligibility results fetched successfully",
+      data: {
+        drive: {
+          id: drive.id,
+          role: drive.role,
+          company: drive.company.name,
+          eligibilityCriteria: drive.eligibilityCriteria,
+        },
+        totalStudents: results.length,
+        eligibleCount: results.filter((student) => student.eligible).length,
+        students: results,
+      },
+    });
+  } catch (error: unknown) {
+    next(error);
+  }
+};
+
+

@@ -8,6 +8,7 @@ import {
   editPlacementDrive,
   partiallyUpdatePlacementDrive,
   removePlacementDrive,
+  fetchDriveEligibility,
 } from "../controllers/placementDrive.controller.js";
 
 import { authenticate } from "../middleware/auth.middleware.js";
@@ -32,6 +33,14 @@ router.get(
   authenticate,
   validate(studentIdSchema, "params"),
   fetchPlacementDriveById,
+);
+
+router.get(
+  "/placement-drives/:id/eligibility",
+  authenticate,
+  authorizeRoles("ADMIN", "PLACEMENT_COORDINATOR"),
+  validate(studentIdSchema, "params"),
+  fetchDriveEligibility,
 );
 
 // Managing placement drives: ADMIN only
